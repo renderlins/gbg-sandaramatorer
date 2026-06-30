@@ -25,6 +25,9 @@
   }
   .topp .ord{font-weight:600; letter-spacing:.02em}
   .topp .ord b{color:var(--gold)}
+  .topp .hem-lank{display:flex; align-items:center; gap:14px; text-decoration:none; color:inherit}
+  .topp .hem-lank:hover .ord{color:var(--gold-soft)}
+  .topp .topp-logo{width:34px; height:34px; display:block}
   .wrap{flex:1; display:flex; align-items:flex-start; justify-content:center; padding:48px 20px}
 
   /* Kort */
@@ -87,7 +90,10 @@
 </head>
 <body>
   <div class="topp">
-    <span class="ord"><b>SK6AG</b> · Innehållshantering</span>
+    <a class="hem-lank" href="../index.html" title="Till startsidan">
+      <img class="topp-logo" src="../logo.svg" alt="GSA">
+      <span class="ord"><b>SK6AG</b> · Göteborgs Sändareamatörer</span>
+    </a>
   </div>
 
   <div class="wrap">
