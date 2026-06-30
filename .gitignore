@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+*.swp
+
+# Node (om du nån gång lägger till verktyg)
+node_modules/
+npm-debug.log*
+
+# Lokala Decap-tester
+.decap-server/

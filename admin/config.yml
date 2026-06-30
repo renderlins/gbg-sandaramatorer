@@ -1,0 +1,42 @@
+# ============================================================
+#  SK6AG – Decap CMS-konfiguration
+#  Ändra raderna markerade med  # ⟵ ÄNDRA  vid uppsättning.
+# ============================================================
+
+backend:
+  name: github
+  repo: renderlins/gbg-sandaramatorer
+  branch: main
+  # base_url pekar på OAuth-funktionen som körs på samma sajt (Cloudflare Pages Functions).
+  # ⟵ ÄNDRA till din pages.dev-adress EFTER första deployen (Cloudflare lägger till ett suffix),
+  #    t.ex. https://gbg-sandaramatorer-a1b.pages.dev  (utan avslutande snedstreck)
+  base_url: https://DIN-ADRESS.pages.dev
+  auth_endpoint: /api/auth
+
+# Var bilder hamnar om du någon gång lägger till bildfält (krävs av Decap även om det inte används).
+media_folder: "media"
+public_folder: "/media"
+
+# Svenska etiketter i gränssnittet
+locale: "sv"
+
+collections:
+  - label: "Nyheter"
+    name: "nyheter"
+    # En "file collection": all data ligger i EN fil, content/nyheter.json
+    files:
+      - label: "Senaste nytt"
+        name: "lista"
+        file: "content/nyheter.json"
+        description: "Klubbens nyheter. Den nyaste visas överst på sajten automatiskt."
+        fields:
+          - label: "Nyheter"
+            label_singular: "nyhet"
+            name: "items"          # OBS: se nyheter.json – listan ligger under "items"
+            widget: "list"
+            add_to_top: true        # nya inlägg hamnar överst i listan
+            summary: "{{fields.datum}} – {{fields.rubrik}}"
+            fields:
+              - { label: "Datum", name: "datum", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, format: "YYYY-MM-DD" }
+              - { label: "Rubrik", name: "rubrik", widget: "string" }
+              - { label: "Text", name: "text", widget: "text" }

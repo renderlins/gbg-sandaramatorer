@@ -1,0 +1,9 @@
+# Cloudflare Pages – cache-styrning
+# Nyhetsdatan ska aldrig cachas, så nypublicerat syns direkt.
+/content/nyheter.json
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Admin-gränssnittet ska inte cachas eller indexeras.
+/admin/*
+  Cache-Control: no-cache
+  X-Robots-Tag: noindex
