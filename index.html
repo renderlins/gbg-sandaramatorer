@@ -262,8 +262,7 @@
   </footer>
 
   <script>
-  // Hämtar nyheter från content/nyheter.json och visar de tre senaste.
-  // Cache-bustning (?v=tid) så att nypublicerat syns direkt trots Cloudflares cache.
+  // Hämtar nyheter från databasen via /api/news och visar de tre senaste.
   (function () {
     var MANADER = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
     function svDatum(iso) {
@@ -277,10 +276,10 @@
       });
     }
     var lista = document.getElementById('news-list');
-    fetch('content/nyheter.json?v=' + Date.now())
+    fetch('/api/news')
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (data) {
-        var items = (data && data.items) || [];
+        var items = (data && data.nyheter) || [];
         items.sort(function (a, b) { return (b.datum || '').localeCompare(a.datum || ''); });
         var senaste = items.slice(0, 3);
         if (!senaste.length) {

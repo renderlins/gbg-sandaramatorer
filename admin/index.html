@@ -1,13 +1,279 @@
 <!doctype html>
 <html lang="sv">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex">
-  <title>SK6AG – Innehållshantering</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Logga in – SK6AG</title>
+<style>
+  :root{
+    --navy:#0c2747; --navy-2:#103154; --navy-3:#0a2039;
+    --cobalt:#1b56b0; --gold:#f2c200; --gold-soft:#f6d75a;
+    --paper:#eef3f8; --muted:#8ea4bd; --line:rgba(242,194,0,.22);
+    --fel:#ff8d7a; --ok:#7ad19b;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; background:var(--navy); color:var(--paper);
+    font-family:"Helvetica Neue",Arial,sans-serif; line-height:1.55;
+    display:flex; flex-direction:column;
+  }
+  a{color:var(--gold-soft)}
+  .topp{
+    border-bottom:1px solid var(--line); padding:18px 26px;
+    display:flex; align-items:center; gap:14px;
+  }
+  .topp .ord{font-weight:600; letter-spacing:.02em}
+  .topp .ord b{color:var(--gold)}
+  .wrap{flex:1; display:flex; align-items:flex-start; justify-content:center; padding:48px 20px}
+
+  /* Kort */
+  .kort{
+    background:var(--navy-2); border:1px solid var(--line); border-radius:14px;
+    padding:34px 32px; width:100%; max-width:440px;
+  }
+  .kort.bred{max-width:760px}
+  h1{font-size:1.5rem; font-weight:600; margin:0 0 4px}
+  .underrubrik{color:var(--muted); font-size:.95rem; margin:0 0 26px}
+
+  label{display:block; font-size:.82rem; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 6px}
+  input,textarea{
+    width:100%; background:var(--navy-3); border:1px solid var(--line);
+    color:var(--paper); border-radius:8px; padding:12px 14px; font:inherit; margin-bottom:18px;
+  }
+  textarea{min-height:110px; resize:vertical}
+  input:focus,textarea:focus{outline:2px solid var(--gold); outline-offset:1px; border-color:transparent}
+
+  .knapp{
+    background:var(--gold); color:var(--navy-3); border:none; border-radius:8px;
+    padding:12px 22px; font:inherit; font-weight:600; cursor:pointer; letter-spacing:.01em;
+  }
+  .knapp:hover{background:var(--gold-soft)}
+  .knapp.spok{background:transparent; color:var(--gold-soft); border:1px solid var(--line)}
+  .knapp.spok:hover{background:rgba(242,194,0,.08)}
+  .knapp.fara{background:transparent; color:var(--fel); border:1px solid rgba(255,141,122,.35)}
+  .knapp.fara:hover{background:rgba(255,141,122,.1)}
+  .knapp:disabled{opacity:.5; cursor:default}
+
+  .rad{display:flex; gap:12px; align-items:center}
+  .rad.mellan{justify-content:space-between}
+  .melding{font-size:.92rem; margin:0 0 18px; padding:10px 14px; border-radius:8px; display:none}
+  .melding.fel{display:block; background:rgba(255,141,122,.12); color:var(--fel)}
+  .melding.ok{display:block; background:rgba(122,209,155,.12); color:var(--ok)}
+
+  /* Nyhetslista */
+  .nyhet{
+    background:var(--navy-3); border:1px solid var(--line); border-radius:10px;
+    padding:16px 18px; margin-bottom:12px;
+  }
+  .nyhet .datum{font-size:.78rem; letter-spacing:.05em; text-transform:uppercase; color:var(--muted)}
+  .nyhet h3{margin:4px 0 6px; font-size:1.08rem; font-weight:600}
+  .nyhet p{margin:0 0 12px; color:#c3d0dd; font-size:.96rem}
+  .delare{height:1px; background:var(--line); margin:26px 0}
+  .doldt{display:none}
+  .litet{font-size:.86rem; color:var(--muted)}
+</style>
 </head>
 <body>
-  <!-- Laddar Decap CMS från CDN. Versionen ^3.0.0 hämtar senaste 3.x. -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <div class="topp">
+    <span class="ord"><b>SK6AG</b> · Innehållshantering</span>
+  </div>
+
+  <div class="wrap">
+
+    <!-- INLOGGNING -->
+    <div class="kort" id="login-kort">
+      <h1>Logga in</h1>
+      <p class="underrubrik">För dig som hanterar klubbens nyheter.</p>
+      <div class="melding" id="login-melding"></div>
+      <label for="epost">E-post</label>
+      <input type="email" id="epost" autocomplete="username" placeholder="namn@exempel.se">
+      <label for="losenord">Lösenord</label>
+      <input type="password" id="losenord" autocomplete="current-password" placeholder="••••••••">
+      <button class="knapp" id="login-knapp" style="width:100%">Logga in</button>
+    </div>
+
+    <!-- HANTERA NYHETER -->
+    <div class="kort bred doldt" id="admin-kort">
+      <div class="rad mellan">
+        <div>
+          <h1>Nyheter</h1>
+          <p class="underrubrik" id="inloggad-som">Inloggad.</p>
+        </div>
+        <button class="knapp spok" id="logout-knapp">Logga ut</button>
+      </div>
+
+      <div class="melding" id="admin-melding"></div>
+
+      <!-- Ny nyhet -->
+      <label for="n-datum">Datum</label>
+      <input type="date" id="n-datum">
+      <label for="n-rubrik">Rubrik</label>
+      <input type="text" id="n-rubrik" placeholder="Kort, tydlig rubrik">
+      <label for="n-text">Text</label>
+      <textarea id="n-text" placeholder="Skriv nyheten här."></textarea>
+      <button class="knapp" id="spara-knapp">Publicera nyhet</button>
+
+      <div class="delare"></div>
+
+      <p class="litet" id="lista-rubrik">Publicerade nyheter</p>
+      <div id="nyhetslista"></div>
+    </div>
+
+  </div>
+
+<script>
+(function () {
+  var MAN = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+  function svDatum(iso){
+    var d = new Date(iso + 'T00:00:00');
+    if (isNaN(d)) return iso;
+    return d.getDate() + ' ' + MAN[d.getMonth()] + ' ' + d.getFullYear();
+  }
+  function esc(s){
+    return String(s).replace(/[&<>"]/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+    });
+  }
+  function visa(el){ el.classList.remove('doldt'); }
+  function dolj(el){ el.classList.add('doldt'); }
+  function melding(el, typ, text){
+    el.className = 'melding ' + typ;
+    el.textContent = text;
+  }
+  function rensaMelding(el){ el.className = 'melding'; el.textContent=''; }
+
+  var loginKort = document.getElementById('login-kort');
+  var adminKort = document.getElementById('admin-kort');
+  var loginMelding = document.getElementById('login-melding');
+  var adminMelding = document.getElementById('admin-melding');
+
+  // --- Inloggningsstatus vid sidladdning ---
+  fetch('/api/me')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      if (data && data.inloggad) visaAdmin(data);
+    })
+    .catch(function(){});
+
+  function visaAdmin(data){
+    dolj(loginKort); visa(adminKort);
+    document.getElementById('inloggad-som').textContent = 'Inloggad som ' + data.epost;
+    laddaNyheter();
+  }
+
+  // --- Logga in ---
+  var loginKnapp = document.getElementById('login-knapp');
+  function loggaIn(){
+    rensaMelding(loginMelding);
+    var epost = document.getElementById('epost').value.trim();
+    var losenord = document.getElementById('losenord').value;
+    if (!epost || !losenord){
+      melding(loginMelding,'fel','Fyll i e-post och lösenord.'); return;
+    }
+    loginKnapp.disabled = true;
+    fetch('/api/login',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({epost:epost, losenord:losenord})
+    })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+    .then(function(res){
+      loginKnapp.disabled = false;
+      if (res.ok){
+        fetch('/api/me').then(function(r){return r.json();}).then(visaAdmin);
+      } else {
+        melding(loginMelding,'fel', res.d.fel || 'Inloggning misslyckades.');
+      }
+    })
+    .catch(function(){
+      loginKnapp.disabled = false;
+      melding(loginMelding,'fel','Något gick fel. Försök igen.');
+    });
+  }
+  loginKnapp.addEventListener('click', loggaIn);
+  document.getElementById('losenord').addEventListener('keydown',function(e){
+    if (e.key === 'Enter') loggaIn();
+  });
+
+  // --- Logga ut ---
+  document.getElementById('logout-knapp').addEventListener('click', function(){
+    fetch('/api/logout',{method:'POST'}).then(function(){
+      visa(loginKort); dolj(adminKort);
+      document.getElementById('losenord').value='';
+    });
+  });
+
+  // --- Ladda nyheter ---
+  function laddaNyheter(){
+    fetch('/api/news')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var lista = document.getElementById('nyhetslista');
+        var items = (data && data.nyheter) || [];
+        if (!items.length){
+          lista.innerHTML = '<p class="litet">Inga nyheter ännu. Den första du publicerar hamnar här.</p>';
+          return;
+        }
+        lista.innerHTML = items.map(function(n){
+          return '<div class="nyhet">'+
+            '<div class="datum">'+esc(svDatum(n.datum))+'</div>'+
+            '<h3>'+esc(n.rubrik)+'</h3>'+
+            '<p>'+esc(n.text)+'</p>'+
+            '<button class="knapp fara" data-id="'+n.id+'">Ta bort</button>'+
+            '</div>';
+        }).join('');
+        [].forEach.call(lista.querySelectorAll('button[data-id]'), function(b){
+          b.addEventListener('click', function(){ taBort(b.getAttribute('data-id')); });
+        });
+      });
+  }
+
+  // --- Publicera ---
+  var sparaKnapp = document.getElementById('spara-knapp');
+  sparaKnapp.addEventListener('click', function(){
+    rensaMelding(adminMelding);
+    var datum = document.getElementById('n-datum').value;
+    var rubrik = document.getElementById('n-rubrik').value.trim();
+    var text = document.getElementById('n-text').value.trim();
+    if (!datum || !rubrik || !text){
+      melding(adminMelding,'fel','Fyll i datum, rubrik och text.'); return;
+    }
+    sparaKnapp.disabled = true;
+    fetch('/api/news',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({datum:datum, rubrik:rubrik, text:text})
+    })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+    .then(function(res){
+      sparaKnapp.disabled = false;
+      if (res.ok){
+        melding(adminMelding,'ok','Nyheten är publicerad.');
+        document.getElementById('n-rubrik').value='';
+        document.getElementById('n-text').value='';
+        document.getElementById('n-datum').value='';
+        laddaNyheter();
+      } else {
+        melding(adminMelding,'fel', res.d.fel || 'Kunde inte spara.');
+      }
+    })
+    .catch(function(){
+      sparaKnapp.disabled = false;
+      melding(adminMelding,'fel','Något gick fel. Försök igen.');
+    });
+  });
+
+  // --- Ta bort ---
+  function taBort(id){
+    if (!confirm('Ta bort den här nyheten?')) return;
+    fetch('/api/news/'+id,{method:'DELETE'})
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        if (res.ok){ laddaNyheter(); }
+        else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
+      });
+  }
+})();
+</script>
 </body>
 </html>

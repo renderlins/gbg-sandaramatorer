@@ -1,0 +1,10 @@
+name = "gbg-sandaramatorer"
+pages_build_output_dir = "."
+compatibility_date = "2026-01-01"
+
+# Binder D1-databasen så att den blir tillgänglig som env.DB i Functions.
+# database_id fylls i efter att du skapat databasen (steg i README).
+[[d1_databases]]
+binding = "DB"
+database_name = "sk6ag-db"
+database_id = "FYLLS-I-EFTER-ATT-DU-SKAPAT-DATABASEN"
