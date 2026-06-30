@@ -44,12 +44,14 @@
   }
   /* Mörkt tema för webbläsarens egna kontroller (datumväljaren m.fl.) */
   input{color-scheme:dark}
-  /* Gör kalenderikonen i datumfältet synlig mot mörk bakgrund */
+  /* Gör kalenderikonen i datumfältet guldfärgad och tydligt klickbar */
   input[type="date"]::-webkit-calendar-picker-indicator{
-    filter:invert(1) brightness(1.4) sepia(1) saturate(4) hue-rotate(5deg);
-    opacity:.85; cursor:pointer;
+    filter:invert(78%) sepia(38%) saturate(700%) hue-rotate(2deg) brightness(98%) contrast(96%);
+    opacity:1; cursor:pointer; padding:4px; margin-left:4px;
   }
-  input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
+  input[type="date"]::-webkit-calendar-picker-indicator:hover{
+    filter:invert(85%) sepia(60%) saturate(900%) hue-rotate(2deg) brightness(105%);
+  }
   textarea{min-height:110px; resize:vertical}
   input:focus,textarea:focus{outline:2px solid var(--gold); outline-offset:1px; border-color:transparent}
 
@@ -236,6 +238,14 @@
         });
       });
   }
+
+  // Öppna kalendern vid klick var som helst på datumfältet (inte bara ikonen).
+  var datumFalt = document.getElementById('n-datum');
+  datumFalt.addEventListener('click', function(){
+    if (typeof datumFalt.showPicker === 'function') {
+      try { datumFalt.showPicker(); } catch (e) {}
+    }
+  });
 
   // --- Publicera ---
   var sparaKnapp = document.getElementById('spara-knapp');
