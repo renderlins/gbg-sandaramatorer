@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kommande – SK6AG</title>
+<style>
+  :root{
+    --navy:#0c2747;--navy-2:#103154;--navy-3:#0a2039;
+    --cobalt:#1b56b0;--gold:#f2c200;--gold-soft:#f6d75a;
+    --paper:#eef3f8;--muted:#8ea4bd;--line:rgba(242,194,0,.22);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--navy);color:var(--paper);font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  a{color:var(--gold-soft)}
+
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(10,32,57,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topbar .inner{display:flex;justify-content:space-between;align-items:center;padding:16px 28px;max-width:1080px;margin:0 auto;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase}
+  .topbar .call-link{text-decoration:none;color:inherit}
+  .topbar .call{color:var(--gold-soft);font-weight:600;display:flex;align-items:center;gap:12px}
+  .topbar .call img{width:28px;height:28px}
+  .topbar nav a{color:var(--muted);text-decoration:none;margin-left:22px;transition:color .2s}
+  .topbar nav a:hover{color:var(--paper)}
+
+  header.head{padding:60px 0 10px;border-bottom:1px solid var(--line)}
+  .sec-label{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:14px}
+  .sec-label::before{content:"";width:34px;height:1px;background:var(--gold)}
+  h1{font-size:clamp(2rem,4vw,2.9rem);font-weight:500;letter-spacing:-.01em;line-height:1.1;margin-bottom:14px}
+  .lead{color:#c3d0dd;max-width:60ch;margin-bottom:40px}
+
+  section{padding:34px 0}
+  h2.month{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-soft);margin:34px 0 16px}
+
+  .pill{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:100px;font-weight:600;white-space:nowrap}
+  .pill.mote   {background:rgba(242,194,0,.16);color:var(--gold-soft);border:1px solid rgba(242,194,0,.4)}
+  .pill.contest{background:rgba(27,86,176,.24);color:#9dc0f2;       border:1px solid rgba(27,86,176,.6)}
+  .pill.faltdag{background:rgba(46,160,110,.18);color:#7fd8ad;       border:1px solid rgba(46,160,110,.5)}
+  .pill.kurs   {background:rgba(120,180,240,.16);color:#bcd8f6;      border:1px solid rgba(120,180,240,.4)}
+  .pill.ovrigt {background:rgba(142,164,189,.14);color:var(--muted); border:1px solid rgba(142,164,189,.35)}
+
+  .events{display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+  .events .ev{background:var(--navy-2);padding:22px 28px;display:grid;grid-template-columns:78px 1fr;gap:24px;align-items:baseline;transition:background .2s}
+  .events .ev:hover{background:var(--navy-3)}
+  .ev .day{font-family:"Helvetica Neue",Arial,sans-serif;text-align:center;line-height:1}
+  .ev .day .d{font-size:1.7rem;font-weight:600;color:var(--gold-soft);display:block}
+  .ev .day .m{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:4px;display:block}
+  .ev .ebody{display:flex;flex-direction:column;gap:8px}
+  .ev .etop{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .ev .ebody h3{font-size:1.2rem;font-weight:500}
+  .ev .ebody p{color:#c3d0dd;font-size:.98rem}
+  .ev-meta{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.78rem;color:var(--muted);letter-spacing:.03em}
+  .ev-meta span+span::before{content:"·";margin:0 8px;color:var(--line)}
+
+  .tom{color:var(--muted);padding:24px 0}
+
+  details.past{margin-top:50px;border-top:1px solid var(--line);padding-top:30px}
+  details.past summary{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px}
+  details.past summary::-webkit-details-marker{display:none}
+  details.past summary::before{content:"▸";color:var(--gold);transition:transform .2s}
+  details.past[open] summary::before{transform:rotate(90deg)}
+  details.past .events{margin-top:20px;opacity:.82}
+
+  footer{border-top:1px solid var(--line);margin-top:70px;padding:40px 0;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.8rem;color:var(--muted)}
+  footer a{margin-right:22px;text-decoration:none}
+
+  @media(max-width:600px){
+    .topbar nav{display:none}
+    .events .ev{grid-template-columns:1fr;gap:8px}
+  }
+</style>
+</head>
+<body>
+  <div class="topbar" id="top">
+    <div class="inner">
+      <a class="call-link" href="../index.html"><span class="call"><img src="../logo.svg" alt="GSA">SK6AG · Göteborgs Sändareamatörer</span></a>
+      <nav>
+        <a href="../index.html#moten">Möten</a>
+        <a href="../index.html#nytt">Nytt</a>
+        <a href="../index.html#kontakt">Kontakt</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="head">
+    <div class="wrap">
+      <div class="sec-label">Kommande</div>
+      <h1>Kalender &amp; evenemang</h1>
+      <p class="lead">Möten, contests, kurser och fältdagar framåt i tiden. Passerade evenemang hamnar automatiskt under Tidigare längst ner.</p>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <div id="upcoming"><p class="tom">Laddar kommande…</p></div>
+
+      <details class="past" id="past-wrap">
+        <summary>Tidigare evenemang</summary>
+        <div id="past"><p class="tom">Laddar…</p></div>
+      </details>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <a href="../index.html">Till startsidan</a>
+      <a href="../index.html#kontakt">Kontakt</a>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+    var MANADER = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+    var MANADER_LANG = ['januari','februari','mars','april','maj','juni','juli','augusti','september','oktober','november','december'];
+    var TYPER = { mote:'Möte', contest:'Contest', faltdag:'Fältdag', kurs:'Kurs', ovrigt:'Övrigt' };
+    function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+    function dagMan(iso){var d=new Date(iso+'T00:00:00');if(isNaN(d))return {d:'',m:''};return {d:('0'+d.getDate()).slice(-2),m:MANADER[d.getMonth()]};}
+    function manadNyckel(iso){var d=new Date(iso+'T00:00:00');if(isNaN(d))return '';return MANADER_LANG[d.getMonth()]+' '+d.getFullYear();}
+    function pill(typ){var t=TYPER[typ]?typ:'ovrigt';return '<span class="pill '+t+'">'+TYPER[t]+'</span>';}
+    function metaRad(ev){var b=[];if(ev.tid)b.push(esc(ev.tid));if(ev.plats)b.push(esc(ev.plats));if(!b.length)return '';return '<div class="ev-meta">'+b.map(function(x){return '<span>'+x+'</span>';}).join('')+'</div>';}
+    function evKort(ev){
+      var dm=dagMan(ev.datum);
+      return '<div class="ev"><div class="day"><span class="d">'+dm.d+'</span><span class="m">'+esc(dm.m)+'</span></div>'+
+        '<div class="ebody"><div class="etop"><h3>'+esc(ev.rubrik)+'</h3>'+pill(ev.typ)+'</div>'+
+        metaRad(ev)+'<p>'+esc(ev.text)+'</p></div></div>';
+    }
+    // Gruppera per månad (för kommande). Poster antas komma sorterade från API.
+    function renderaGrupperat(items){
+      if(!items.length) return '<p class="tom">Inga inplanerade evenemang just nu.</p>';
+      var html='', nuvarande=null, oppen=false;
+      items.forEach(function(ev){
+        var nyckel=manadNyckel(ev.datum);
+        if(nyckel!==nuvarande){
+          if(oppen) html+='</div>';
+          html+='<h2 class="month">'+esc(nyckel)+'</h2><div class="events">';
+          nuvarande=nyckel; oppen=true;
+        }
+        html+=evKort(ev);
+      });
+      if(oppen) html+='</div>';
+      return html;
+    }
+    function renderaPlatt(items){
+      if(!items.length) return '<p class="tom">Inga tidigare evenemang.</p>';
+      return '<div class="events">'+items.map(evKort).join('')+'</div>';
+    }
+
+    fetch('/api/events?scope=upcoming')
+      .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+      .then(function(data){
+        var items=(data&&data.evenemang)||[];
+        document.getElementById('upcoming').innerHTML=renderaGrupperat(items);
+      })
+      .catch(function(){document.getElementById('upcoming').innerHTML='<p class="tom">Kunde inte ladda kommande just nu.</p>';});
+
+    fetch('/api/events?scope=past')
+      .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+      .then(function(data){
+        var items=(data&&data.evenemang)||[];
+        document.getElementById('past').innerHTML=renderaPlatt(items);
+      })
+      .catch(function(){document.getElementById('past').innerHTML='<p class="tom">Kunde inte ladda tidigare just nu.</p>';});
+  })();
+  </script>
+</body>
+</html>

@@ -41,10 +41,11 @@
 
   label{display:block; font-size:.82rem; letter-spacing:.04em; text-transform:uppercase;
     color:var(--muted); margin:0 0 6px}
-  input,textarea{
+  input,textarea,select{
     width:100%; background:var(--navy-3); border:1px solid var(--line);
     color:var(--paper); border-radius:8px; padding:12px 14px; font:inherit; margin-bottom:18px;
   }
+  select{color-scheme:dark; cursor:pointer}
   /* Mörkt tema för webbläsarens egna kontroller (datumväljaren m.fl.) */
   input{color-scheme:dark}
   /* Gör kalenderikonen i datumfältet guldfärgad och tydligt klickbar */
@@ -56,7 +57,7 @@
     filter:invert(85%) sepia(60%) saturate(900%) hue-rotate(2deg) brightness(105%);
   }
   textarea{min-height:110px; resize:vertical}
-  input:focus,textarea:focus{outline:2px solid var(--gold); outline-offset:1px; border-color:transparent}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--gold); outline-offset:1px; border-color:transparent}
 
   .knapp{
     background:var(--gold); color:var(--navy-3); border:none; border-radius:8px;
@@ -135,6 +136,36 @@
 
       <p class="litet" id="lista-rubrik">Publicerade nyheter</p>
       <div id="nyhetslista"></div>
+
+      <div class="delare"></div>
+
+      <!-- Nytt evenemang -->
+      <h1 style="margin-top:6px">Evenemang</h1>
+      <p class="underrubrik">Möten, contests, kurser och fältdagar framåt i tiden.</p>
+      <label for="e-datum">Datum</label>
+      <input type="date" id="e-datum">
+      <label for="e-tid">Tid <span style="color:var(--muted);text-transform:none;letter-spacing:0">(valfritt)</span></label>
+      <input type="text" id="e-tid" placeholder="t.ex. 19:00 eller Hela helgen">
+      <label for="e-plats">Plats <span style="color:var(--muted);text-transform:none;letter-spacing:0">(valfritt)</span></label>
+      <input type="text" id="e-plats" placeholder="t.ex. Radiomuseet, Göteborg">
+      <label for="e-typ">Typ</label>
+      <select id="e-typ">
+        <option value="mote">Möte</option>
+        <option value="contest">Contest</option>
+        <option value="faltdag">Fältdag</option>
+        <option value="kurs">Kurs</option>
+        <option value="ovrigt">Övrigt</option>
+      </select>
+      <label for="e-rubrik">Rubrik</label>
+      <input type="text" id="e-rubrik" placeholder="Kort, tydlig rubrik">
+      <label for="e-text">Text</label>
+      <textarea id="e-text" placeholder="Beskriv evenemanget här."></textarea>
+      <button class="knapp" id="spara-ev-knapp">Lägg till evenemang</button>
+
+      <div class="delare"></div>
+
+      <p class="litet">Inlagda evenemang</p>
+      <div id="evenemangslista"></div>
     </div>
 
   </div>
@@ -177,6 +208,7 @@
     dolj(loginKort); visa(adminKort);
     document.getElementById('inloggad-som').textContent = 'Inloggad som ' + data.epost;
     laddaNyheter();
+    laddaEvenemang();
   }
 
   // --- Logga in ---
@@ -294,6 +326,99 @@
       .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
       .then(function(res){
         if (res.ok){ laddaNyheter(); }
+        else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
+      });
+  }
+
+  // ====================== EVENEMANG ======================
+  var TYP_NAMN = { mote:'Möte', contest:'Contest', faltdag:'Fältdag', kurs:'Kurs', ovrigt:'Övrigt' };
+
+  // --- Ladda evenemang (alla, stigande) ---
+  function laddaEvenemang(){
+    fetch('/api/events?scope=all')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var lista = document.getElementById('evenemangslista');
+        var items = (data && data.evenemang) || [];
+        if (!items.length){
+          lista.innerHTML = '<p class="litet">Inga evenemang ännu. Det första du lägger till hamnar här.</p>';
+          return;
+        }
+        lista.innerHTML = items.map(function(ev){
+          var rader = [];
+          if (ev.tid) rader.push(esc(ev.tid));
+          if (ev.plats) rader.push(esc(ev.plats));
+          var meta = rader.length ? '<p style="margin:0 0 8px;color:var(--muted);font-size:.9rem">'+rader.join(' · ')+'</p>' : '';
+          var typ = TYP_NAMN[ev.typ] || 'Övrigt';
+          return '<div class="nyhet">'+
+            '<div class="datum">'+esc(svDatum(ev.datum))+' · '+esc(typ)+'</div>'+
+            '<h3>'+esc(ev.rubrik)+'</h3>'+
+            meta+
+            '<p>'+esc(ev.text)+'</p>'+
+            '<button class="knapp fara" data-ev-id="'+ev.id+'">Ta bort</button>'+
+            '</div>';
+        }).join('');
+        [].forEach.call(lista.querySelectorAll('button[data-ev-id]'), function(b){
+          b.addEventListener('click', function(){ taBortEv(b.getAttribute('data-ev-id')); });
+        });
+      });
+  }
+
+  // Öppna kalendern vid klick var som helst på event-datumfältet.
+  var evDatumFalt = document.getElementById('e-datum');
+  evDatumFalt.addEventListener('click', function(){
+    if (typeof evDatumFalt.showPicker === 'function') {
+      try { evDatumFalt.showPicker(); } catch (e) {}
+    }
+  });
+
+  // --- Lägg till evenemang ---
+  var sparaEvKnapp = document.getElementById('spara-ev-knapp');
+  sparaEvKnapp.addEventListener('click', function(){
+    rensaMelding(adminMelding);
+    var datum = document.getElementById('e-datum').value;
+    var tid = document.getElementById('e-tid').value.trim();
+    var plats = document.getElementById('e-plats').value.trim();
+    var typ = document.getElementById('e-typ').value;
+    var rubrik = document.getElementById('e-rubrik').value.trim();
+    var text = document.getElementById('e-text').value.trim();
+    if (!datum || !rubrik || !text){
+      melding(adminMelding,'fel','Fyll i datum, rubrik och text för evenemanget.'); return;
+    }
+    sparaEvKnapp.disabled = true;
+    fetch('/api/events',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({datum:datum, tid:tid, plats:plats, typ:typ, rubrik:rubrik, text:text})
+    })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+    .then(function(res){
+      sparaEvKnapp.disabled = false;
+      if (res.ok){
+        melding(adminMelding,'ok','Evenemanget är tillagt.');
+        document.getElementById('e-datum').value='';
+        document.getElementById('e-tid').value='';
+        document.getElementById('e-plats').value='';
+        document.getElementById('e-typ').value='mote';
+        document.getElementById('e-rubrik').value='';
+        document.getElementById('e-text').value='';
+        laddaEvenemang();
+      } else {
+        melding(adminMelding,'fel', res.d.fel || 'Kunde inte spara evenemanget.');
+      }
+    })
+    .catch(function(){
+      sparaEvKnapp.disabled = false;
+      melding(adminMelding,'fel','Något gick fel. Försök igen.');
+    });
+  });
+
+  // --- Ta bort evenemang ---
+  function taBortEv(id){
+    if (!confirm('Ta bort det här evenemanget?')) return;
+    fetch('/api/events/'+id,{method:'DELETE'})
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        if (res.ok){ laddaEvenemang(); }
         else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
       });
   }
