@@ -156,7 +156,15 @@
         // sidladdning missar. Scrolla dit manuellt när målet finns i DOM:en.
         if (location.hash) {
           var mal = document.getElementById(location.hash.slice(1));
-          if (mal) { mal.scrollIntoView(); mal.classList.add('markerad'); }
+          if (mal) {
+            mal.classList.add('markerad');
+            // Räkna ut mittenposition manuellt. scrollIntoView({block:'center'})
+            // klarar inta att centrera det översta eventet (för lite innehåll
+            // ovanför), så vi scrollar fönstret direkt till önskad position.
+            var y = mal.getBoundingClientRect().top + window.pageYOffset;
+            var mitt = y - (window.innerHeight / 2) + (mal.offsetHeight / 2);
+            window.scrollTo({ top: mitt, behavior: 'smooth' });
+          }
         }
       })
       .catch(function(){document.getElementById('upcoming').innerHTML='<p class="tom">Kunde inte ladda kommande just nu.</p>';});
