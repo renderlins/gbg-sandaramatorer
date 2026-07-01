@@ -161,6 +161,8 @@
     padding:13px 18px; margin-bottom:20px; cursor:pointer; font:inherit; color:var(--gold-soft);
     transition:background .15s}
   .notisrad:hover{background:rgba(242,194,0,.18)}
+  .notisrad-fel{background:rgba(255,141,122,.1); border-color:rgba(255,141,122,.4); color:var(--fel)}
+  .notisrad-fel:hover{background:rgba(255,141,122,.18)}
   .notisrad .notis-ikon{font-size:1.1rem}
   .notisrad #notis-text{flex:1; font-weight:600}
   .notisrad .notis-pil{font-size:1.1rem}
@@ -244,6 +246,12 @@
         <span class="notis-pil">→</span>
       </button>
 
+      <button class="notisrad notisrad-fel doldt" id="notisrad-fel" type="button">
+        <span class="notis-ikon">⚠</span>
+        <span id="notis-fel-text">Du har nya felanmälningar</span>
+        <span class="notis-pil">→</span>
+      </button>
+
       <div class="layoutD">
         <nav class="sidomeny" id="sidomeny">
           <button class="snav aktiv" data-pane="pane-ev">Evenemang</button>
@@ -252,6 +260,7 @@
           <button class="snav" data-pane="pane-forfr">Förfrågningar<span class="badge doldt" id="forfr-badge">0</span></button>
           <button class="snav" data-pane="pane-rep">Repeatrar</button>
           <button class="snav" data-pane="pane-sdr">SDR-mottagare</button>
+          <button class="snav" data-pane="pane-fel">Felanmälningar<span class="badge doldt" id="fel-badge">0</span></button>
           <button class="snav senare" disabled>Köp &amp; sälj<span class="taggen">Kommer senare</span></button>
         </nav>
 
@@ -431,6 +440,16 @@
             <div id="sdrlista"></div>
           </div>
 
+          <!-- Pane: Felanmälningar -->
+          <div class="pane" id="pane-fel">
+            <h1>Felanmälningar</h1>
+            <p class="underrubrik">Driftstörningar på repeatrar och SDR-mottagare, inkomna från felanmälningsformuläret.</p>
+            <div class="rad mellan">
+              <p class="litet" id="fel-rakning">Inkomna</p>
+            </div>
+            <div id="fellista"></div>
+          </div>
+
         </div>
       </div>
 
@@ -505,6 +524,8 @@
     });
     var notisrad = document.getElementById('notisrad');
     if (notisrad) notisrad.addEventListener('click', function(){ visaPane('pane-forfr'); });
+    var notisradFel = document.getElementById('notisrad-fel');
+    if (notisradFel) notisradFel.addEventListener('click', function(){ visaPane('pane-fel'); });
   })();
 
   // --- Logga in ---
@@ -824,64 +845,73 @@
       });
   }
 
-  // ====================== FÖRFRÅGNINGAR ======================
+  // ====================== FÖRFRÅGNINGAR & FELANMÄLNINGAR ======================
+  function forfrKortHtml(f){
+    var arFel = (f.arende === 'felanmalan');
+    var taggar = [];
+    if (f.vill_bli_medlem) taggar.push('Vill bli medlem');
+    if (f.bidrag_repeater) taggar.push('Bidrag repeater/SDR');
+    if (f.bidrag_klubb) taggar.push('Bidrag SK6AG');
+    if (f.har_fraga) taggar.push('Har en fråga');
+    var taggHtml = taggar.length ? '<div class="taggar">'+taggar.map(function(t){return '<span class="f-tag">'+esc(t)+'</span>';}).join('')+'</div>' : '';
+    var call = f.callsign ? '<span class="call">'+esc(f.callsign)+'</span>' : '';
+    var medd = f.meddelande ? '<div class="medd">'+esc(f.meddelande)+'</div>' : '';
+    var gallerHtml = (arFel && f.galler) ? '<div class="medd" style="color:var(--gold-soft)"><b>Gäller:</b> '+esc(f.galler)+'</div>' : '';
+    return '<div class="forfr'+(f.hanterad?' klar':'')+'">'+
+      '<div class="topp"><div class="namn">'+esc(f.namn)+call+'</div>'+
+      '<div class="datum">'+esc(svDatum((f.skapad||'').slice(0,10)))+'</div></div>'+
+      '<div class="epost"><a href="mailto:'+esc(f.epost)+'">'+esc(f.epost)+'</a></div>'+
+      gallerHtml + taggHtml + medd +
+      '<div class="knappar">'+
+      '<button class="f-klar" data-klar="'+f.id+'" data-nu="'+(f.hanterad?1:0)+'">'+(f.hanterad?'Markera ohanterad':'Markera hanterad')+'</button>'+
+      '<button class="f-ta" data-fta="'+f.id+'">Ta bort</button>'+
+      '</div></div>';
+  }
+  function kopplaForfrKnappar(behallare){
+    [].forEach.call(behallare.querySelectorAll('button[data-klar]'), function(b){
+      b.addEventListener('click', function(){ togglaHanterad(b.getAttribute('data-klar'), b.getAttribute('data-nu')); });
+    });
+    [].forEach.call(behallare.querySelectorAll('button[data-fta]'), function(b){
+      b.addEventListener('click', function(){ taBortForfr(b.getAttribute('data-fta')); });
+    });
+  }
+  function satBadgeNotis(badgeId, notisId, textId, antal, enText, flerText){
+    var badge = document.getElementById(badgeId);
+    if (antal > 0){ badge.textContent = antal; badge.classList.remove('doldt'); }
+    else { badge.classList.add('doldt'); }
+    var notis = document.getElementById(notisId);
+    if (antal > 0){
+      document.getElementById(textId).textContent = 'Du har ' + antal + ' ' + (antal === 1 ? enText : flerText);
+      notis.classList.remove('doldt');
+    } else {
+      notis.classList.add('doldt');
+    }
+  }
+
   function laddaForfragningar(){
     fetch('/api/requests')
       .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
       .then(function(res){
-        var lista = document.getElementById('forfrlista');
-        var rakning = document.getElementById('forfr-rakning');
-        if (!res.ok){ lista.innerHTML = '<p class="litet">Kunde inte ladda förfrågningar.</p>'; return; }
-        var items = (res.d && res.d.forfragningar) || [];
-        var oppna = items.filter(function(f){ return !f.hanterad; }).length;
-        rakning.textContent = 'Inkomna: ' + items.length + ' · Ohanterade: ' + oppna;
+        var forfrLista = document.getElementById('forfrlista');
+        var felLista = document.getElementById('fellista');
+        if (!res.ok){ forfrLista.innerHTML = '<p class="litet">Kunde inte ladda.</p>'; return; }
+        var alla = (res.d && res.d.forfragningar) || [];
+        var medlem = alla.filter(function(f){ return f.arende !== 'felanmalan'; });
+        var fel = alla.filter(function(f){ return f.arende === 'felanmalan'; });
 
-        // Badge på sidomenyns Förfrågningar-flik
-        var badge = document.getElementById('forfr-badge');
-        if (oppna > 0){ badge.textContent = oppna; badge.classList.remove('doldt'); }
-        else { badge.classList.add('doldt'); }
+        // Medlemsförfrågningar
+        var oppnaM = medlem.filter(function(f){ return !f.hanterad; }).length;
+        document.getElementById('forfr-rakning').textContent = 'Inkomna: ' + medlem.length + ' · Ohanterade: ' + oppnaM;
+        satBadgeNotis('forfr-badge', 'notisrad', 'notis-text', oppnaM, 'ny förfrågan', 'nya förfrågningar');
+        forfrLista.innerHTML = medlem.length ? medlem.map(forfrKortHtml).join('') : '<p class="litet">Inga förfrågningar ännu.</p>';
+        kopplaForfrKnappar(forfrLista);
 
-        // Notisrad högst upp
-        var notisrad = document.getElementById('notisrad');
-        var notisText = document.getElementById('notis-text');
-        if (oppna > 0){
-          notisText.textContent = 'Du har ' + oppna + (oppna === 1 ? ' ny förfrågan' : ' nya förfrågningar');
-          notisrad.classList.remove('doldt');
-        } else {
-          notisrad.classList.add('doldt');
-        }
-        if (!items.length){
-          lista.innerHTML = '<p class="litet">Inga förfrågningar ännu.</p>';
-          return;
-        }
-        lista.innerHTML = items.map(function(f){
-          var arFel = (f.arende === 'felanmalan');
-          var taggar = [];
-          if (f.vill_bli_medlem) taggar.push('Vill bli medlem');
-          if (f.bidrag_repeater) taggar.push('Bidrag repeater/SDR');
-          if (f.bidrag_klubb) taggar.push('Bidrag SK6AG');
-          if (f.har_fraga) taggar.push('Har en fråga');
-          var taggHtml = taggar.length ? '<div class="taggar">'+taggar.map(function(t){return '<span class="f-tag">'+esc(t)+'</span>';}).join('')+'</div>' : '';
-          var call = f.callsign ? '<span class="call">'+esc(f.callsign)+'</span>' : '';
-          var medd = f.meddelande ? '<div class="medd">'+esc(f.meddelande)+'</div>' : '';
-          var arendeMärke = arFel ? '<span class="f-tag" style="background:rgba(255,141,122,.14);color:var(--fel);border-color:rgba(255,141,122,.4)">Felanmälan</span>' : '';
-          var gallerHtml = (arFel && f.galler) ? '<div class="medd" style="color:var(--gold-soft)"><b>Gäller:</b> '+esc(f.galler)+'</div>' : '';
-          return '<div class="forfr'+(f.hanterad?' klar':'')+'">'+
-            '<div class="topp"><div class="namn">'+esc(f.namn)+call+' '+arendeMärke+'</div>'+
-            '<div class="datum">'+esc(svDatum((f.skapad||'').slice(0,10)))+'</div></div>'+
-            '<div class="epost"><a href="mailto:'+esc(f.epost)+'">'+esc(f.epost)+'</a></div>'+
-            gallerHtml + taggHtml + medd +
-            '<div class="knappar">'+
-            '<button class="f-klar" data-klar="'+f.id+'" data-nu="'+(f.hanterad?1:0)+'">'+(f.hanterad?'Markera ohanterad':'Markera hanterad')+'</button>'+
-            '<button class="f-ta" data-fta="'+f.id+'">Ta bort</button>'+
-            '</div></div>';
-        }).join('');
-        [].forEach.call(lista.querySelectorAll('button[data-klar]'), function(b){
-          b.addEventListener('click', function(){ togglaHanterad(b.getAttribute('data-klar'), b.getAttribute('data-nu')); });
-        });
-        [].forEach.call(lista.querySelectorAll('button[data-fta]'), function(b){
-          b.addEventListener('click', function(){ taBortForfr(b.getAttribute('data-fta')); });
-        });
+        // Felanmälningar
+        var oppnaF = fel.filter(function(f){ return !f.hanterad; }).length;
+        document.getElementById('fel-rakning').textContent = 'Inkomna: ' + fel.length + ' · Ohanterade: ' + oppnaF;
+        satBadgeNotis('fel-badge', 'notisrad-fel', 'notis-fel-text', oppnaF, 'ny felanmälan', 'nya felanmälningar');
+        felLista.innerHTML = fel.length ? fel.map(forfrKortHtml).join('') : '<p class="litet">Inga felanmälningar ännu.</p>';
+        kopplaForfrKnappar(felLista);
       });
   }
 
