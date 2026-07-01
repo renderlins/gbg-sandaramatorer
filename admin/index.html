@@ -154,6 +154,27 @@
   .f-klar:hover{background:rgba(122,209,155,.1)}
   .f-ta{background:none; border:none; color:var(--fel); cursor:pointer; font:inherit; font-size:.82rem; opacity:.7}
   .f-ta:hover{opacity:1}
+
+  /* Notisrad + badge */
+  .notisrad{display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    background:rgba(242,194,0,.1); border:1px solid rgba(242,194,0,.4); border-radius:10px;
+    padding:13px 18px; margin-bottom:20px; cursor:pointer; font:inherit; color:var(--gold-soft);
+    transition:background .15s}
+  .notisrad:hover{background:rgba(242,194,0,.18)}
+  .notisrad .notis-ikon{font-size:1.1rem}
+  .notisrad #notis-text{flex:1; font-weight:600}
+  .notisrad .notis-pil{font-size:1.1rem}
+  .badge{display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px;
+    padding:0 6px; margin-left:8px; border-radius:100px; background:var(--gold); color:var(--navy-3);
+    font-size:.72rem; font-weight:700; vertical-align:middle}
+
+  /* Go-to-top */
+  .till-topp{position:fixed; right:24px; bottom:24px; width:46px; height:46px; border-radius:50%;
+    background:var(--navy-2); border:1px solid var(--line); color:var(--gold-soft); cursor:pointer;
+    font-size:1.3rem; line-height:1; display:none; align-items:center; justify-content:center;
+    z-index:60; transition:background .15s, opacity .2s; box-shadow:0 4px 14px rgba(0,0,0,.3)}
+  .till-topp:hover{background:var(--navy-3)}
+  .till-topp.syns{display:flex}
 </style>
 </head>
 <body>
@@ -190,12 +211,18 @@
 
       <div class="melding" id="admin-melding"></div>
 
+      <button class="notisrad doldt" id="notisrad" type="button">
+        <span class="notis-ikon">✉</span>
+        <span id="notis-text">Du har nya förfrågningar</span>
+        <span class="notis-pil">→</span>
+      </button>
+
       <div class="layoutD">
         <nav class="sidomeny" id="sidomeny">
           <button class="snav aktiv" data-pane="pane-ev">Evenemang</button>
           <button class="snav" data-pane="pane-news">Nyheter</button>
           <button class="snav" data-pane="pane-medlem">Medlemmar</button>
-          <button class="snav" data-pane="pane-forfr">Förfrågningar</button>
+          <button class="snav" data-pane="pane-forfr">Förfrågningar<span class="badge doldt" id="forfr-badge">0</span></button>
           <button class="snav senare" disabled>Köp &amp; sälj<span class="taggen">Kommer senare</span></button>
         </nav>
 
@@ -336,18 +363,24 @@
   }
 
   // --- Sidomeny: växla pane ---
+  function visaPane(pane){
+    var meny = document.getElementById('sidomeny');
+    if (!meny) return;
+    meny.querySelectorAll('.snav[data-pane]').forEach(function(b){
+      b.classList.toggle('aktiv', b.getAttribute('data-pane') === pane);
+    });
+    document.querySelectorAll('.arbetsyta .pane').forEach(function(p){ p.classList.remove('aktiv'); });
+    var m = document.getElementById(pane);
+    if (m) m.classList.add('aktiv');
+  }
   (function(){
     var meny = document.getElementById('sidomeny');
     if (!meny) return;
     meny.querySelectorAll('.snav[data-pane]').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        meny.querySelectorAll('.snav[data-pane]').forEach(function(b){ b.classList.remove('aktiv'); });
-        btn.classList.add('aktiv');
-        document.querySelectorAll('.arbetsyta .pane').forEach(function(p){ p.classList.remove('aktiv'); });
-        var m = document.getElementById(btn.getAttribute('data-pane'));
-        if (m) m.classList.add('aktiv');
-      });
+      btn.addEventListener('click', function(){ visaPane(btn.getAttribute('data-pane')); });
     });
+    var notisrad = document.getElementById('notisrad');
+    if (notisrad) notisrad.addEventListener('click', function(){ visaPane('pane-forfr'); });
   })();
 
   // --- Logga in ---
@@ -678,6 +711,21 @@
         var items = (res.d && res.d.forfragningar) || [];
         var oppna = items.filter(function(f){ return !f.hanterad; }).length;
         rakning.textContent = 'Inkomna: ' + items.length + ' · Ohanterade: ' + oppna;
+
+        // Badge på sidomenyns Förfrågningar-flik
+        var badge = document.getElementById('forfr-badge');
+        if (oppna > 0){ badge.textContent = oppna; badge.classList.remove('doldt'); }
+        else { badge.classList.add('doldt'); }
+
+        // Notisrad högst upp
+        var notisrad = document.getElementById('notisrad');
+        var notisText = document.getElementById('notis-text');
+        if (oppna > 0){
+          notisText.textContent = 'Du har ' + oppna + (oppna === 1 ? ' ny förfrågan' : ' nya förfrågningar');
+          notisrad.classList.remove('doldt');
+        } else {
+          notisrad.classList.add('doldt');
+        }
         if (!items.length){
           lista.innerHTML = '<p class="litet">Inga förfrågningar ännu.</p>';
           return;
@@ -732,6 +780,18 @@
         else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
       });
   }
+})();
+</script>
+<button class="till-topp" id="till-topp" title="Till toppen" aria-label="Till toppen">↑</button>
+<script>
+(function(){
+  var knapp = document.getElementById('till-topp');
+  if (!knapp) return;
+  window.addEventListener('scroll', function(){
+    if (window.pageYOffset > 300) knapp.classList.add('syns');
+    else knapp.classList.remove('syns');
+  });
+  knapp.addEventListener('click', function(){ window.scrollTo({ top:0, behavior:'smooth' }); });
 })();
 </script>
 </body>

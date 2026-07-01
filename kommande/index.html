@@ -179,5 +179,13 @@
       .catch(function(){document.getElementById('past').innerHTML='<p class="tom">Kunde inte ladda tidigare just nu.</p>';});
   })();
   </script>
+<button id="till-topp" title="Till toppen" aria-label="Till toppen" style="position:fixed;right:24px;bottom:24px;width:46px;height:46px;border-radius:50%;background:var(--navy-2);border:1px solid var(--line);color:var(--gold-soft);cursor:pointer;font-size:1.3rem;line-height:1;display:none;align-items:center;justify-content:center;z-index:60;box-shadow:0 4px 14px rgba(0,0,0,.3)">↑</button>
+<script>
+(function(){
+  var k=document.getElementById('till-topp');
+  window.addEventListener('scroll',function(){k.style.display=window.pageYOffset>300?'flex':'none';});
+  k.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+})();
+</script>
 </body>
 </html>
