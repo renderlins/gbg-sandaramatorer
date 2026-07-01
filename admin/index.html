@@ -109,6 +109,29 @@
   .delare{height:1px; background:var(--line); margin:26px 0}
   .doldt{display:none}
   .litet{font-size:.86rem; color:var(--muted)}
+
+  /* Medlemslista */
+  .medlem{background:var(--navy-3); border:1px solid var(--line); border-radius:10px;
+    padding:12px 16px; margin-bottom:10px; display:grid;
+    grid-template-columns:auto auto 1fr auto auto; gap:14px; align-items:center}
+  .medlem .call{font-weight:600; font-size:1.05rem; letter-spacing:.03em}
+  .m-pill{font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; padding:3px 9px;
+    border-radius:100px; font-weight:600; white-space:nowrap}
+  .m-pill.medlem{background:rgba(242,194,0,.16); color:var(--gold-soft); border:1px solid rgba(242,194,0,.4)}
+  .m-pill.stod  {background:rgba(120,180,240,.16); color:#bcd8f6; border:1px solid rgba(120,180,240,.4)}
+  .m-pill.ej    {background:rgba(142,164,189,.14); color:var(--muted); border:1px solid rgba(142,164,189,.35)}
+  .m-not{font-size:.84rem; color:var(--muted)}
+  .m-betald{font-size:.82rem; white-space:nowrap; cursor:pointer; border:1px solid var(--line);
+    background:none; color:inherit; border-radius:8px; padding:6px 11px; font:inherit; transition:background .15s}
+  .m-betald:hover{background:var(--navy-2)}
+  .m-betald.ja{color:var(--ok); border-color:rgba(122,209,155,.4)}
+  .m-betald.nej{color:var(--fel); border-color:rgba(255,141,122,.35)}
+  .m-ta{background:none; border:none; color:var(--fel); cursor:pointer; font:inherit; font-size:.82rem; opacity:.7}
+  .m-ta:hover{opacity:1}
+  @media(max-width:620px){
+    .medlem{grid-template-columns:1fr auto; gap:8px}
+    .medlem .m-not{grid-column:1/-1}
+  }
 </style>
 </head>
 <body>
@@ -148,9 +171,9 @@
       <div class="layoutD">
         <nav class="sidomeny" id="sidomeny">
           <button class="snav aktiv" data-pane="pane-ev">Evenemang</button>
+          <button class="snav" data-pane="pane-medlem">Medlemmar</button>
           <button class="snav" data-pane="pane-news">Nyheter</button>
           <button class="snav senare" disabled>Köp &amp; sälj<span class="taggen">Kommer senare</span></button>
-          <button class="snav senare" disabled>Medlemmar<span class="taggen">Kommer senare</span></button>
         </nav>
 
         <div class="arbetsyta">
@@ -203,6 +226,33 @@
             <div id="nyhetslista"></div>
           </div>
 
+          <!-- Pane: Medlemmar -->
+          <div class="pane" id="pane-medlem">
+            <h1>Medlemmar</h1>
+            <p class="underrubrik">Internt register – syns aldrig publikt. Endast anropssignal och betalstatus.</p>
+
+            <label for="m-callsign">Anropssignal</label>
+            <input type="text" id="m-callsign" placeholder="t.ex. SM6XYZ" style="text-transform:uppercase">
+            <label for="m-status">Status</label>
+            <select id="m-status">
+              <option value="medlem">Medlem</option>
+              <option value="stod">Stödmedlem</option>
+              <option value="ej">Ej medlem</option>
+            </select>
+            <label for="m-ar">Betald för år <span style="color:var(--muted);text-transform:none;letter-spacing:0">(lämna tomt om ej betald)</span></label>
+            <input type="number" id="m-ar" placeholder="t.ex. 2026" min="1900" max="2100">
+            <label for="m-not">Notering <span style="color:var(--muted);text-transform:none;letter-spacing:0">(valfritt)</span></label>
+            <input type="text" id="m-not" placeholder="t.ex. familjemedlemskap, ungdom">
+            <button class="knapp" id="spara-medlem-knapp">Lägg till medlem</button>
+
+            <div class="delare"></div>
+
+            <div class="rad mellan">
+              <p class="litet" id="medlem-rakning">Registrerade</p>
+            </div>
+            <div id="medlemslista"></div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -248,6 +298,7 @@
     document.getElementById('inloggad-som').textContent = 'Inloggad som ' + data.epost;
     laddaNyheter();
     laddaEvenemang();
+    laddaMedlemmar();
   }
 
   // --- Sidomeny: växla pane ---
@@ -473,6 +524,111 @@
       .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
       .then(function(res){
         if (res.ok){ laddaEvenemang(); }
+        else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
+      });
+  }
+
+  // ====================== MEDLEMMAR ======================
+  var STATUS_NAMN = { medlem:'Medlem', stod:'Stödmedlem', ej:'Ej medlem' };
+  var I_AR = new Date().getFullYear();
+
+  function laddaMedlemmar(){
+    fetch('/api/members')
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        var lista = document.getElementById('medlemslista');
+        var rakning = document.getElementById('medlem-rakning');
+        if (!res.ok){
+          lista.innerHTML = '<p class="litet">Kunde inte ladda registret.</p>';
+          return;
+        }
+        var items = (res.d && res.d.medlemmar) || [];
+        var antalMedlem = items.filter(function(m){ return m.status==='medlem'; }).length;
+        var antalBetalt = items.filter(function(m){ return m.betald_ar >= I_AR; }).length;
+        rakning.textContent = 'Registrerade: ' + items.length + ' · Medlemmar: ' + antalMedlem + ' · Betalt ' + I_AR + ': ' + antalBetalt;
+        if (!items.length){
+          lista.innerHTML = '<p class="litet">Inga registrerade ännu. Den första du lägger till hamnar här.</p>';
+          return;
+        }
+        lista.innerHTML = items.map(function(m){
+          var betald = (m.betald_ar !== null && m.betald_ar !== undefined);
+          var betaldAktuell = m.betald_ar >= I_AR;
+          var btnKlass = betaldAktuell ? 'ja' : 'nej';
+          var btnText = betald ? ('Betald ' + m.betald_ar) : 'Ej betald';
+          var not = m.noteringar ? '<span class="m-not">'+esc(m.noteringar)+'</span>' : '<span class="m-not"></span>';
+          return '<div class="medlem">'+
+            '<span class="call">'+esc(m.callsign)+'</span>'+
+            '<span class="m-pill '+(STATUS_NAMN[m.status]?m.status:'ej')+'">'+(STATUS_NAMN[m.status]||'Ej medlem')+'</span>'+
+            not+
+            '<button class="m-betald '+btnKlass+'" data-toggle="'+m.id+'" data-ar="'+(m.betald_ar||'')+'">'+btnText+'</button>'+
+            '<button class="m-ta" data-ta="'+m.id+'">Ta bort</button>'+
+            '</div>';
+        }).join('');
+        [].forEach.call(lista.querySelectorAll('button[data-toggle]'), function(b){
+          b.addEventListener('click', function(){ togglaBetald(b.getAttribute('data-toggle'), b.getAttribute('data-ar')); });
+        });
+        [].forEach.call(lista.querySelectorAll('button[data-ta]'), function(b){
+          b.addEventListener('click', function(){ taBortMedlem(b.getAttribute('data-ta')); });
+        });
+      });
+  }
+
+  // Klick på betald-knappen: har de betalt för i år → nolla; annars → sätt i år.
+  function togglaBetald(id, nuvarandeAr){
+    var betaltIAr = parseInt(nuvarandeAr, 10) >= I_AR;
+    var nyttAr = betaltIAr ? null : I_AR;
+    fetch('/api/members/'+id, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ betald_ar: nyttAr })
+    })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+    .then(function(res){
+      if (res.ok){ laddaMedlemmar(); }
+      else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte uppdatera.'); }
+    });
+  }
+
+  var sparaMedlemKnapp = document.getElementById('spara-medlem-knapp');
+  sparaMedlemKnapp.addEventListener('click', function(){
+    rensaMelding(adminMelding);
+    var callsign = document.getElementById('m-callsign').value.trim().toUpperCase();
+    var status = document.getElementById('m-status').value;
+    var ar = document.getElementById('m-ar').value.trim();
+    var not = document.getElementById('m-not').value.trim();
+    if (!callsign){
+      melding(adminMelding,'fel','Ange en anropssignal.'); return;
+    }
+    sparaMedlemKnapp.disabled = true;
+    fetch('/api/members', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ callsign:callsign, status:status, betald_ar:ar, noteringar:not })
+    })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+    .then(function(res){
+      sparaMedlemKnapp.disabled = false;
+      if (res.ok){
+        melding(adminMelding,'ok','Medlemmen är tillagd.');
+        document.getElementById('m-callsign').value='';
+        document.getElementById('m-status').value='medlem';
+        document.getElementById('m-ar').value='';
+        document.getElementById('m-not').value='';
+        laddaMedlemmar();
+      } else {
+        melding(adminMelding,'fel', res.d.fel || 'Kunde inte spara.');
+      }
+    })
+    .catch(function(){
+      sparaMedlemKnapp.disabled = false;
+      melding(adminMelding,'fel','Något gick fel. Försök igen.');
+    });
+  });
+
+  function taBortMedlem(id){
+    if (!confirm('Ta bort den här posten ur registret?')) return;
+    fetch('/api/members/'+id,{method:'DELETE'})
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        if (res.ok){ laddaMedlemmar(); }
         else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
       });
   }
