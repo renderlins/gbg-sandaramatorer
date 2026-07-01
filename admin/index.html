@@ -113,24 +113,25 @@
   /* Medlemslista */
   .medlem{background:var(--navy-3); border:1px solid var(--line); border-radius:10px;
     padding:12px 16px; margin-bottom:10px; display:grid;
-    grid-template-columns:auto auto 1fr auto auto; gap:14px; align-items:center}
-  .medlem .call{font-weight:600; font-size:1.05rem; letter-spacing:.03em}
-  .m-pill{font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; padding:3px 9px;
+    grid-template-columns:96px auto 1fr auto auto; gap:14px; align-items:center}
+  .medlem .call{font-weight:600; font-size:1.05rem; letter-spacing:.03em; white-space:nowrap}
+  .m-pill{display:inline-flex; align-items:center; justify-self:start; font-size:.66rem;
+    letter-spacing:.08em; text-transform:uppercase; padding:4px 11px; line-height:1;
     border-radius:100px; font-weight:600; white-space:nowrap}
   .m-pill.medlem{background:rgba(242,194,0,.16); color:var(--gold-soft); border:1px solid rgba(242,194,0,.4)}
   .m-pill.stod  {background:rgba(120,180,240,.16); color:#bcd8f6; border:1px solid rgba(120,180,240,.4)}
   .m-pill.ej    {background:rgba(142,164,189,.14); color:var(--muted); border:1px solid rgba(142,164,189,.35)}
-  .m-not{font-size:.84rem; color:var(--muted)}
+  .m-not{font-size:.84rem; color:var(--muted); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .m-betald{font-size:.82rem; white-space:nowrap; cursor:pointer; border:1px solid var(--line);
     background:none; color:inherit; border-radius:8px; padding:6px 11px; font:inherit; transition:background .15s}
   .m-betald:hover{background:var(--navy-2)}
   .m-betald.ja{color:var(--ok); border-color:rgba(122,209,155,.4)}
   .m-betald.nej{color:var(--fel); border-color:rgba(255,141,122,.35)}
-  .m-ta{background:none; border:none; color:var(--fel); cursor:pointer; font:inherit; font-size:.82rem; opacity:.7}
+  .m-ta{background:none; border:none; color:var(--fel); cursor:pointer; font:inherit; font-size:.82rem; opacity:.7; white-space:nowrap}
   .m-ta:hover{opacity:1}
   @media(max-width:620px){
-    .medlem{grid-template-columns:1fr auto; gap:8px}
-    .medlem .m-not{grid-column:1/-1}
+    .medlem{grid-template-columns:1fr auto auto; gap:8px 10px}
+    .medlem .m-not{grid-column:1/-1; white-space:normal}
   }
 </style>
 </head>
@@ -171,8 +172,8 @@
       <div class="layoutD">
         <nav class="sidomeny" id="sidomeny">
           <button class="snav aktiv" data-pane="pane-ev">Evenemang</button>
-          <button class="snav" data-pane="pane-medlem">Medlemmar</button>
           <button class="snav" data-pane="pane-news">Nyheter</button>
+          <button class="snav" data-pane="pane-medlem">Medlemmar</button>
           <button class="snav senare" disabled>Köp &amp; sälj<span class="taggen">Kommer senare</span></button>
         </nav>
 
