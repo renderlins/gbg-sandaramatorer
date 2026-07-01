@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repeatrar – SK6AG</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<style>
+  :root{
+    --navy:#0c2747;--navy-2:#103154;--navy-3:#0a2039;
+    --cobalt:#1b56b0;--gold:#f2c200;--gold-soft:#f6d75a;
+    --paper:#eef3f8;--muted:#8ea4bd;--line:rgba(242,194,0,.22);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--navy);color:var(--paper);font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:900px;margin:0 auto;padding:0 28px}
+  a{color:var(--gold-soft)}
+
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(10,32,57,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topbar .inner{display:flex;justify-content:space-between;align-items:center;padding:16px 28px;max-width:1080px;margin:0 auto;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase}
+  .topbar .call-link{text-decoration:none;color:inherit}
+  .topbar .call{color:var(--gold-soft);font-weight:600;display:flex;align-items:center;gap:12px}
+  .topbar .call img{width:28px;height:28px}
+  .topbar nav a{color:var(--muted);text-decoration:none;margin-left:22px;transition:color .2s}
+  .topbar nav a:hover{color:var(--paper)}
+
+  header.head{padding:60px 0 10px;border-bottom:1px solid var(--line)}
+  .sec-label{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:14px}
+  .sec-label::before{content:"";width:34px;height:1px;background:var(--gold)}
+  h1{font-size:clamp(2rem,4vw,2.9rem);font-weight:500;letter-spacing:-.01em;line-height:1.1;margin-bottom:14px}
+  .lead{color:#c3d0dd;max-width:64ch;margin-bottom:16px}
+
+  section{padding:36px 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:none}
+  h2{font-size:1.5rem;font-weight:500;margin-bottom:8px}
+  h3{font-size:1.1rem;font-weight:600;margin:22px 0 8px;color:var(--gold-soft)}
+  p{margin-bottom:14px;color:#d3dde8}
+  .platslabel{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:26px 0 12px}
+
+  /* Frekvenstabell */
+  .tabellwrap{overflow-x:auto;margin:8px 0 6px;border:1px solid var(--line);border-radius:10px}
+  table{width:100%;border-collapse:collapse;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.92rem;min-width:560px}
+  thead th{background:var(--navy-3);color:var(--gold);text-align:left;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;padding:12px 16px;white-space:nowrap}
+  tbody td{padding:12px 16px;border-top:1px solid var(--line);color:#d3dde8}
+  tbody tr:hover{background:var(--navy-2)}
+  .frq{color:var(--gold-soft);font-weight:600;white-space:nowrap}
+  .call-cell{font-weight:600;color:var(--paper);white-space:nowrap}
+  .mode-pill{display:inline-block;font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:100px;font-weight:600;background:rgba(242,194,0,.14);color:var(--gold-soft);border:1px solid rgba(242,194,0,.35)}
+
+  .specs{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.94rem}
+  .specs .rad{display:grid;grid-template-columns:180px 1fr;gap:16px;padding:9px 0;border-bottom:1px solid rgba(242,194,0,.1)}
+  .specs .rad .k{color:var(--muted);font-size:.86rem}
+  .specs .rad .v{color:#d3dde8}
+  @media(max-width:600px){.specs .rad{grid-template-columns:1fr;gap:2px}}
+
+  .info-kort{background:var(--navy-2);border:1px solid var(--line);border-left:3px solid var(--gold);padding:20px 24px;margin:12px 0}
+  .info-kort p:last-child{margin-bottom:0}
+
+  .cta-rad{margin-top:20px}
+  .btn{display:inline-block;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;padding:14px 28px;text-decoration:none;font-weight:700;transition:background .2s,transform .2s,border-color .2s}
+  .btn-primary{color:var(--navy);background:var(--gold)}
+  .btn-primary:hover{background:var(--gold-soft);transform:translateY(-2px)}
+
+  .anm{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.9rem;color:var(--muted);margin-top:14px}
+
+  footer{border-top:1px solid var(--line);margin-top:50px;padding:40px 0;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.8rem;color:var(--muted)}
+  footer a{margin-right:22px;text-decoration:none}
+  @media(max-width:600px){.topbar nav{display:none}}
+</style>
+</head>
+<body>
+  <div class="topbar" id="top">
+    <div class="inner">
+      <a class="call-link" href="../index.html"><span class="call"><img src="../favicon.svg" alt="GSA">SK6AG · Göteborgs Sändareamatörer</span></a>
+      <nav>
+        <a href="../index.html#moten">Möten</a>
+        <a href="../index.html#kommande">Kommande</a>
+        <a href="../index.html#kontakt">Kontakt</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="head">
+    <div class="wrap">
+      <div class="sec-label">Repeatrar</div>
+      <h1>Repeaterinformation</h1>
+      <p class="lead">GSA driver sex repeatrar i Göteborg — två på HF (10 m och 6 m), en på VHF (2 m) och tre på UHF (70 cm). Du som vill höra på trafiken kan lyssna på utfrekvensen för varje repeater. Vill du fördjupa dig i hur SvxLink fungerar finns <a href="https://sk7rfl.se/repeaterskolan/" target="_blank" rel="noopener">SvxLink repeaterskola</a>.</p>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <h2>Frekvenser</h2>
+      <p>Våra repeatrar på 2 m och 70 cm är inkopplade i detta förnäma system, där du kan vidarekoppla dig runt landet till andra repeatrar med hjälp av DTMF-toner.</p>
+
+      <div class="platslabel">Guldheden</div>
+      <div class="tabellwrap">
+        <table>
+          <thead>
+            <tr><th>Anropssignal</th><th>Band</th><th>Frekvens</th><th>Läge / mode</th><th>Kanal / info</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="call-cell">SK6SA</td><td>70 cm</td><td class="frq">434.5125 MHz</td><td><span class="mode-pill">D-STAR</span></td><td>Icom, RU361 (−2 MHz)</td></tr>
+            <tr><td class="call-cell">SK6AG</td><td>70 cm</td><td class="frq">434.7875 MHz</td><td><span class="mode-pill">DMR</span></td><td>Hytera Ru7x, RU383 (−2 MHz), CC6, TS1&amp;2</td></tr>
+            <tr><td class="call-cell">SK6RFQ</td><td>70 cm</td><td class="frq">434.600 MHz</td><td><span class="mode-pill">C4FM</span></td><td>RU0, kopplad mot SWEDEN-HUB</td></tr>
+            <tr><td class="call-cell">SK6RFQ</td><td>2 m</td><td class="frq">145.650 MHz</td><td><span class="mode-pill">FM</span></td><td>R2 (RV52), analogt via SvxLink</td></tr>
+            <tr><td class="call-cell">SK6RFQ</td><td>70 cm</td><td class="frq">434.650 MHz</td><td><span class="mode-pill">FM</span></td><td>RU2 (RU372), parallellt med 2 m</td></tr>
+            <tr><td class="call-cell">SK6RFQ</td><td>6 m</td><td class="frq">51.870 MHz</td><td><span class="mode-pill">TX</span></td><td>Radiolänk på 400 MHz</td></tr>
+            <tr><td class="call-cell">SK6RFQ</td><td>10 m</td><td class="frq">29.680 MHz</td><td><span class="mode-pill">TX</span></td><td>Radiolänk på 400 MHz</td></tr>
+            <tr><td class="call-cell">SK6RKI</td><td>23 cm</td><td class="frq">1297.150 MHz</td><td><span class="mode-pill">FM</span></td><td>Eget formulär för felanmälan</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="platslabel">Kortedala</div>
+      <div class="tabellwrap">
+        <table>
+          <thead>
+            <tr><th>Anropssignal</th><th>Band</th><th>Frekvens</th><th>Läge / mode</th><th>Info</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="call-cell">SK6RFQ</td><td>10 m</td><td class="frq">29.580 MHz</td><td><span class="mode-pill">RX</span></td><td>Mottagare</td></tr>
+            <tr><td class="call-cell">SK6RFQ</td><td>6 m</td><td class="frq">51.270 MHz</td><td><span class="mode-pill">RX</span></td><td>Mottagare</td></tr>
+            <tr><td class="call-cell">SK6RFQ</td><td>2 m</td><td class="frq">—</td><td><span class="mode-pill">RX</span></td><td>Endast 2 m-mottagare</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="anm">Locator JO57XQ, ca 120 m ö.h. De analoga repeatrarna på 2 m respektive 70 cm finns på RV52 (145.650 MHz, FM N-12,5 kHz) respektive RU372 (434.650 MHz).</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Göteborgsnätet</h2>
+      <div class="info-kort">
+        <p>Varje söndag kl. 20:00 lokal tid — med undantag för sommaruppehållet — sänds Göteborgsnätet över vår 2 m-repeater (RV52/R2) samt över 70 cm-repeatern (RU372/RU2). Alla är välkomna att checka in.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Teknisk information</h2>
+
+      <h3>2 m &amp; 70 cm — Guldheden</h3>
+      <div class="specs">
+        <div class="rad"><div class="k">TX-antenn VHF</div><div class="v">Aerial Oy AV1912 (4-stackade öppna dipoler)</div></div>
+        <div class="rad"><div class="k">Matare VHF</div><div class="v">4 m Huber-Suhner SUCOFEED ½″ (−2,7 dB/100 m)</div></div>
+        <div class="rad"><div class="k">Sändare VHF</div><div class="v">Motorola GM 340, 20 W efter kavitetsfilter</div></div>
+        <div class="rad"><div class="k">TX-antenn UHF</div><div class="v">Aerial Oy AV1914 (4-stackade öppna dipoler)</div></div>
+        <div class="rad"><div class="k">Matare UHF</div><div class="v">6 m Cellflex ½″ (−6,7 dB/100 m)</div></div>
+        <div class="rad"><div class="k">Sändare UHF</div><div class="v">Motorola GM 360, 10 W</div></div>
+        <div class="rad"><div class="k">Slutsteg UHF</div><div class="v">Johnsson 80 W efter kavitetsfilter (fd Comvik-slutsteg)</div></div>
+        <div class="rad"><div class="k">RX-antenn VHF</div><div class="v">Triband</div></div>
+        <div class="rad"><div class="k">RX-matare VHF</div><div class="v">12 m Cellflex ½″ (−2,7 dB/100 m)</div></div>
+        <div class="rad"><div class="k">Mottagare VHF</div><div class="v">Motorola GM 340, känslighet 0,3 µV vid 12 dB Sinad</div></div>
+        <div class="rad"><div class="k">RX-antenn UHF</div><div class="v">Aerial Oy AV1914 (4-stackade öppna dipoler)</div></div>
+        <div class="rad"><div class="k">RX-matare UHF</div><div class="v">11 m Huber-Suhner SUCOFEED ½″ (−6,7 dB/100 m)</div></div>
+        <div class="rad"><div class="k">Mottagare UHF</div><div class="v">Motorola GM 360, känslighet 0,3 µV vid 12 dB Sinad</div></div>
+      </div>
+      <p style="margin-top:16px">Repeaterlogik: en ny repeaterlogik på 2 m och 70 cm är analog-repeaterna gemensam logik, dvs. repeaternas RX och TX är helt parallellkopplade. Repeatrarna öppnas med 1750 Hz, DTMF 1 eller CTCSS 114,8 Hz. Repeatrarna har UPS för att säkerställa drift vid eventuellt strömbortfall.</p>
+
+      <h3>6 m &amp; 10 m</h3>
+      <p>Vår 10 m-repeater har utfrekvens 29.680 MHz och infrekvens 29.580 MHz. Vår 6 m-repeater har utfrekvens 51.870 MHz och infrekvens 51.270 MHz. Sändarna finns på Guldheden och mottagarna i Kortedala. Mellan dessa länkas ljud och styrsignal. Båda öppnas med 1750 Hz, subton 114,8 Hz eller DTMF 6. Repeatrarna har gemensam logik, dvs. RX och TX är helt parallellkopplade.</p>
+
+      <h3>D-STAR — SK6SA</h3>
+      <p>D-STAR-repeatern (SK6SA B), Guldheden, för 70 cm är igång på kanal RU361 (434.5125 MHz, −2 MHz).</p>
+
+      <h3>DMR — SK6AG</h3>
+      <p>DMR-repeatern (SK6AG), Guldheden, för 70 cm är igång på kanal RU383 (434.7875 MHz, −2 MHz), CC6. Timeslot 1 &amp; 2 länkade till Brandmeister. Då talgruppen kan ändras både statiskt (av repeateransvarig) samt dynamiskt av varje operatör hänvisas till <a href="https://brandmeister.network/" target="_blank" rel="noopener">Brandmeister</a> för att se vad repeatern för stunden är inställd på.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Anmäl en driftstörning</h2>
+      <p>Fungerar inte en repeater eller SDR-mottagare som den ska? Använd formuläret så når din felanmälan rätt person. Ange gärna vilken repeater det gäller i meddelandet.</p>
+      <div class="cta-rad">
+        <a href="../medlem/" class="btn btn-primary">Till felanmälan</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <a href="../index.html">Till startsidan</a>
+      <a href="../index.html#kontakt">Kontakt</a>
+    </div>
+  </footer>
+
+  <button id="till-topp" title="Till toppen" aria-label="Till toppen" style="position:fixed;right:24px;bottom:24px;width:46px;height:46px;border-radius:50%;background:var(--navy-2);border:1px solid var(--line);color:var(--gold-soft);cursor:pointer;font-size:1.3rem;line-height:1;display:none;align-items:center;justify-content:center;z-index:60;box-shadow:0 4px 14px rgba(0,0,0,.3)">↑</button>
+  <script>
+  (function(){
+    var k=document.getElementById('till-topp');
+    window.addEventListener('scroll',function(){k.style.display=window.pageYOffset>300?'flex':'none';});
+    k.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  })();
+  </script>
+</body>
+</html>
