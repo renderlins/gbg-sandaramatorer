@@ -133,6 +133,27 @@
     .medlem{grid-template-columns:1fr auto auto; gap:8px 10px}
     .medlem .m-not{grid-column:1/-1; white-space:normal}
   }
+
+  /* Förfrågningar */
+  .forfr{background:var(--navy-3); border:1px solid var(--line); border-radius:10px;
+    padding:16px 18px; margin-bottom:12px}
+  .forfr.klar{opacity:.55}
+  .forfr .topp{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+  .forfr .namn{font-weight:600; font-size:1.05rem}
+  .forfr .call{color:var(--gold-soft); font-weight:600; margin-left:8px}
+  .forfr .datum{font-size:.76rem; letter-spacing:.05em; text-transform:uppercase; color:var(--muted)}
+  .forfr .epost{font-size:.9rem; color:#c3d0dd; margin:4px 0 10px}
+  .forfr .epost a{color:var(--gold-soft)}
+  .forfr .taggar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
+  .f-tag{font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; padding:3px 10px;
+    border-radius:100px; font-weight:600; background:rgba(242,194,0,.14); color:var(--gold-soft); border:1px solid rgba(242,194,0,.35)}
+  .forfr .medd{color:#d3dde8; font-size:.96rem; margin-bottom:12px; white-space:pre-wrap}
+  .forfr .knappar{display:flex; gap:10px}
+  .f-klar{background:none; border:1px solid rgba(122,209,155,.4); color:var(--ok); cursor:pointer;
+    font:inherit; font-size:.82rem; border-radius:8px; padding:6px 12px}
+  .f-klar:hover{background:rgba(122,209,155,.1)}
+  .f-ta{background:none; border:none; color:var(--fel); cursor:pointer; font:inherit; font-size:.82rem; opacity:.7}
+  .f-ta:hover{opacity:1}
 </style>
 </head>
 <body>
@@ -174,6 +195,7 @@
           <button class="snav aktiv" data-pane="pane-ev">Evenemang</button>
           <button class="snav" data-pane="pane-news">Nyheter</button>
           <button class="snav" data-pane="pane-medlem">Medlemmar</button>
+          <button class="snav" data-pane="pane-forfr">Förfrågningar</button>
           <button class="snav senare" disabled>Köp &amp; sälj<span class="taggen">Kommer senare</span></button>
         </nav>
 
@@ -254,6 +276,16 @@
             <div id="medlemslista"></div>
           </div>
 
+          <!-- Pane: Förfrågningar -->
+          <div class="pane" id="pane-forfr">
+            <h1>Förfrågningar</h1>
+            <p class="underrubrik">Anmälningar och frågor från medlemssidan. Syns aldrig publikt.</p>
+            <div class="rad mellan">
+              <p class="litet" id="forfr-rakning">Inkomna</p>
+            </div>
+            <div id="forfrlista"></div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -300,6 +332,7 @@
     laddaNyheter();
     laddaEvenemang();
     laddaMedlemmar();
+    laddaForfragningar();
   }
 
   // --- Sidomeny: växla pane ---
@@ -630,6 +663,72 @@
       .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
       .then(function(res){
         if (res.ok){ laddaMedlemmar(); }
+        else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
+      });
+  }
+
+  // ====================== FÖRFRÅGNINGAR ======================
+  function laddaForfragningar(){
+    fetch('/api/requests')
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        var lista = document.getElementById('forfrlista');
+        var rakning = document.getElementById('forfr-rakning');
+        if (!res.ok){ lista.innerHTML = '<p class="litet">Kunde inte ladda förfrågningar.</p>'; return; }
+        var items = (res.d && res.d.forfragningar) || [];
+        var oppna = items.filter(function(f){ return !f.hanterad; }).length;
+        rakning.textContent = 'Inkomna: ' + items.length + ' · Ohanterade: ' + oppna;
+        if (!items.length){
+          lista.innerHTML = '<p class="litet">Inga förfrågningar ännu.</p>';
+          return;
+        }
+        lista.innerHTML = items.map(function(f){
+          var taggar = [];
+          if (f.vill_bli_medlem) taggar.push('Vill bli medlem');
+          if (f.bidrag_repeater) taggar.push('Bidrag repeater/SDR');
+          if (f.bidrag_klubb) taggar.push('Bidrag SK6AG');
+          if (f.har_fraga) taggar.push('Har en fråga');
+          var taggHtml = taggar.length ? '<div class="taggar">'+taggar.map(function(t){return '<span class="f-tag">'+esc(t)+'</span>';}).join('')+'</div>' : '';
+          var call = f.callsign ? '<span class="call">'+esc(f.callsign)+'</span>' : '';
+          var medd = f.meddelande ? '<div class="medd">'+esc(f.meddelande)+'</div>' : '';
+          return '<div class="forfr'+(f.hanterad?' klar':'')+'">'+
+            '<div class="topp"><div class="namn">'+esc(f.namn)+call+'</div>'+
+            '<div class="datum">'+esc(svDatum((f.skapad||'').slice(0,10)))+'</div></div>'+
+            '<div class="epost"><a href="mailto:'+esc(f.epost)+'">'+esc(f.epost)+'</a></div>'+
+            taggHtml + medd +
+            '<div class="knappar">'+
+            '<button class="f-klar" data-klar="'+f.id+'" data-nu="'+(f.hanterad?1:0)+'">'+(f.hanterad?'Markera ohanterad':'Markera hanterad')+'</button>'+
+            '<button class="f-ta" data-fta="'+f.id+'">Ta bort</button>'+
+            '</div></div>';
+        }).join('');
+        [].forEach.call(lista.querySelectorAll('button[data-klar]'), function(b){
+          b.addEventListener('click', function(){ togglaHanterad(b.getAttribute('data-klar'), b.getAttribute('data-nu')); });
+        });
+        [].forEach.call(lista.querySelectorAll('button[data-fta]'), function(b){
+          b.addEventListener('click', function(){ taBortForfr(b.getAttribute('data-fta')); });
+        });
+      });
+  }
+
+  function togglaHanterad(id, nu){
+    var nyttVarde = parseInt(nu,10) ? 0 : 1;
+    fetch('/api/requests/'+id, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ hanterad: nyttVarde })
+    })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+    .then(function(res){
+      if (res.ok){ laddaForfragningar(); }
+      else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte uppdatera.'); }
+    });
+  }
+
+  function taBortForfr(id){
+    if (!confirm('Ta bort den här förfrågan?')) return;
+    fetch('/api/requests/'+id,{method:'DELETE'})
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        if (res.ok){ laddaForfragningar(); }
         else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
       });
   }

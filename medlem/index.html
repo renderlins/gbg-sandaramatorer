@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bli medlem – SK6AG</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<style>
+  :root{
+    --navy:#0c2747;--navy-2:#103154;--navy-3:#0a2039;
+    --cobalt:#1b56b0;--gold:#f2c200;--gold-soft:#f6d75a;
+    --paper:#eef3f8;--muted:#8ea4bd;--line:rgba(242,194,0,.22);
+    --fel:#ff8d7a;--ok:#7ad19b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--navy);color:var(--paper);font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:0 28px}
+  a{color:var(--gold-soft)}
+
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(10,32,57,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topbar .inner{display:flex;justify-content:space-between;align-items:center;padding:16px 28px;max-width:1080px;margin:0 auto;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase}
+  .topbar .call-link{text-decoration:none;color:inherit}
+  .topbar .call{color:var(--gold-soft);font-weight:600;display:flex;align-items:center;gap:12px}
+  .topbar .call img{width:28px;height:28px}
+  .topbar nav a{color:var(--muted);text-decoration:none;margin-left:22px;transition:color .2s}
+  .topbar nav a:hover{color:var(--paper)}
+
+  header.head{padding:60px 0 10px}
+  .sec-label{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:14px}
+  .sec-label::before{content:"";width:34px;height:1px;background:var(--gold)}
+  h1{font-size:clamp(2rem,4vw,2.9rem);font-weight:500;letter-spacing:-.01em;line-height:1.1;margin-bottom:14px}
+  .lead{color:#c3d0dd;max-width:60ch;margin-bottom:10px}
+
+  section{padding:30px 0}
+  h2{font-size:1.4rem;font-weight:500;margin-bottom:14px}
+  p{margin-bottom:14px;color:#d3dde8}
+  .betalkort{background:var(--navy-2);border:1px solid var(--line);border-left:3px solid var(--gold);padding:24px 28px;margin:8px 0 10px}
+  .betalkort .rad{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .betalkort .stor{font-size:1.3rem;color:var(--gold-soft);font-weight:500}
+  .betalkort .etikett{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+
+  form{margin-top:10px}
+  label{display:block;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;margin-top:18px}
+  input[type=text],input[type=email],textarea{width:100%;background:var(--navy-3);border:1px solid var(--line);color:var(--paper);border-radius:8px;padding:12px 14px;font:inherit;color-scheme:dark}
+  textarea{min-height:120px;resize:vertical}
+  input:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+  .kryss{margin-top:10px}
+  .kryss label{display:flex;align-items:center;gap:10px;text-transform:none;letter-spacing:0;font-family:"Iowan Old Style",Georgia,serif;font-size:1rem;color:var(--paper);margin:10px 0}
+  .kryss input{width:18px;height:18px;accent-color:var(--gold)}
+  .honung{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .skicka{margin-top:24px;background:var(--gold);color:var(--navy-3);border:none;border-radius:8px;padding:13px 26px;font:inherit;font-weight:600;cursor:pointer;font-family:"Helvetica Neue",Arial,sans-serif;letter-spacing:.03em}
+  .skicka:hover{background:var(--gold-soft)}
+  .skicka:disabled{opacity:.6;cursor:default}
+  .melding{margin-top:18px;padding:12px 16px;border-radius:8px;display:none;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.92rem}
+  .melding.fel{display:block;background:rgba(255,141,122,.12);color:var(--fel)}
+  .melding.ok{display:block;background:rgba(122,209,155,.12);color:var(--ok)}
+  .gdpr{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.82rem;color:var(--muted);margin-top:16px}
+
+  footer{border-top:1px solid var(--line);margin-top:50px;padding:40px 0;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.8rem;color:var(--muted)}
+  footer a{margin-right:22px;text-decoration:none}
+
+  @media(max-width:600px){.topbar nav{display:none}}
+</style>
+</head>
+<body>
+  <div class="topbar" id="top">
+    <div class="inner">
+      <a class="call-link" href="../index.html"><span class="call"><img src="../favicon.svg" alt="GSA">SK6AG · Göteborgs Sändareamatörer</span></a>
+      <nav>
+        <a href="../index.html#moten">Möten</a>
+        <a href="../index.html#kommande">Kommande</a>
+        <a href="../index.html#kontakt">Kontakt</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="head">
+    <div class="wrap">
+      <div class="sec-label">Medlemskap</div>
+      <h1>Välkommen in i kamratgänget</h1>
+      <p class="lead">Fullt medlemskap får du genom att betala medlemsavgiften. Vill du hellre bara stödja klubben går det lika bra – allt hjälper till att hålla igång repeatrar och SDR-mottagare.</p>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <h2>Betala medlemsavgiften</h2>
+      <div class="betalkort">
+        <div class="rad">
+          <div><div class="etikett">Avgift 2026</div><div class="stor">200 kr</div></div>
+          <div><div class="etikett">Plusgiro</div><div class="stor">42 20 64 – 6</div></div>
+        </div>
+      </div>
+      <p>Ange <strong>namn och anropssignal</strong> vid betalningen, så får du QRO medlemstidning och andra utskick från klubben. Avgiften gäller hela familjen, men med en röst. Ungdomar under 18 år har fritt medlemskap – kontakta kassören.</p>
+      <p style="color:var(--muted);font-size:.95rem">Styrelsen förbehåller sig rätten att avböja medlemsansökan, varvid inbetald avgift återbetalas.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Anmäl dig eller ställ en fråga</h2>
+      <p>Fyll gärna i formuläret så får vi dina kontaktuppgifter rätt från början – oavsett om du vill bli medlem, stödja klubben eller bara undra något.</p>
+
+      <form id="medlem-form" autocomplete="on">
+        <label for="f-callsign">Anropssignal <span style="text-transform:none;letter-spacing:0;color:var(--muted)">(om du har någon)</span></label>
+        <input type="text" id="f-callsign" style="text-transform:uppercase" placeholder="t.ex. SM6XYZ">
+
+        <label for="f-namn">Namn *</label>
+        <input type="text" id="f-namn" required placeholder="För- och efternamn">
+
+        <label for="f-epost">E-postadress *</label>
+        <input type="email" id="f-epost" required placeholder="namn@exempel.se">
+
+        <div class="kryss">
+          <label><input type="checkbox" id="f-medlem"> Jag vill bli medlem</label>
+          <label><input type="checkbox" id="f-repeater"> Jag vill bidra till repeater och SDR</label>
+          <label><input type="checkbox" id="f-klubb"> Jag vill bidra till SK6AG</label>
+          <label><input type="checkbox" id="f-fraga"> Jag har en fråga att ställa</label>
+        </div>
+
+        <label for="f-meddelande">Meddelande</label>
+        <textarea id="f-meddelande" placeholder="Skriv gärna några rader."></textarea>
+
+        <div class="honung" aria-hidden="true">
+          <label for="f-webbplats">Lämna detta fält tomt</label>
+          <input type="text" id="f-webbplats" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button type="button" class="skicka" id="skicka-knapp">Skicka</button>
+        <div class="melding" id="form-melding"></div>
+
+        <p class="gdpr">Dina uppgifter används endast för att klubben ska kunna kontakta dig angående din anmälan. De lämnas inte vidare till tredje part.</p>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <a href="../index.html">Till startsidan</a>
+      <a href="../index.html#kontakt">Kontakt</a>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+    function esc(s){return String(s);}
+    var knapp = document.getElementById('skicka-knapp');
+    var melding = document.getElementById('form-melding');
+    function visaMelding(typ, text){ melding.className = 'melding ' + typ; melding.textContent = text; }
+    function rensa(){ melding.className = 'melding'; melding.textContent = ''; }
+
+    knapp.addEventListener('click', function(){
+      rensa();
+      var namn = document.getElementById('f-namn').value.trim();
+      var epost = document.getElementById('f-epost').value.trim();
+      if (!namn || !epost){
+        visaMelding('fel','Fyll i namn och e-postadress.'); return;
+      }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(epost)){
+        visaMelding('fel','Ange en giltig e-postadress.'); return;
+      }
+      var payload = {
+        callsign: document.getElementById('f-callsign').value.trim(),
+        namn: namn,
+        epost: epost,
+        vill_bli_medlem: document.getElementById('f-medlem').checked,
+        bidrag_repeater: document.getElementById('f-repeater').checked,
+        bidrag_klubb: document.getElementById('f-klubb').checked,
+        har_fraga: document.getElementById('f-fraga').checked,
+        meddelande: document.getElementById('f-meddelande').value.trim(),
+        webbplats: document.getElementById('f-webbplats').value
+      };
+      knapp.disabled = true;
+      fetch('/api/requests', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      })
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        knapp.disabled = false;
+        if (res.ok){
+          visaMelding('ok','Tack! Din anmälan är skickad. Vi hör av oss.');
+          document.getElementById('medlem-form').reset();
+        } else {
+          visaMelding('fel', res.d.fel || 'Kunde inte skicka just nu.');
+        }
+      })
+      .catch(function(){
+        knapp.disabled = false;
+        visaMelding('fel','Något gick fel. Försök igen.');
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
