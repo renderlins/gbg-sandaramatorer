@@ -86,7 +86,8 @@
   .pill.ovrigt {background:rgba(142,164,189,.14);color:var(--muted); border:1px solid rgba(142,164,189,.35)}
   .ev-meta{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.78rem;color:var(--muted);letter-spacing:.03em}
   .ev-meta span+span::before{content:"·";margin:0 8px;color:var(--line)}
-  .next-hero{background:var(--navy-2);border:1px solid var(--line);border-left:3px solid var(--gold);padding:30px 34px;margin-bottom:1px}
+  .next-hero{display:block;text-decoration:none;color:inherit;cursor:pointer;background:var(--navy-2);border:1px solid var(--line);border-left:3px solid var(--gold);padding:30px 34px;margin-bottom:1px;transition:background .2s}
+  .next-hero:hover{background:var(--navy-3)}
   .next-hero .nh-tag{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
   .next-hero .nh-row{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
   .next-hero .nh-date{text-align:center;font-family:"Helvetica Neue",Arial,sans-serif;line-height:1}
@@ -95,7 +96,7 @@
   .next-hero .nh-body h3{font-size:1.5rem;font-weight:500;margin-bottom:8px}
   .next-hero .nh-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
   .rest{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-top:none}
-  .rest .r{background:var(--navy-2);padding:16px 30px;display:grid;grid-template-columns:64px 1fr auto;gap:20px;align-items:center;transition:background .2s}
+  .rest .r{text-decoration:none;color:inherit;cursor:pointer;background:var(--navy-2);padding:16px 30px;display:grid;grid-template-columns:64px 1fr auto;gap:20px;align-items:center;transition:background .2s}
   .rest .r:hover{background:var(--navy-3)}
   .rest .r-date{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.82rem;color:var(--gold-soft);letter-spacing:.04em}
   .rest .r h3{font-size:1rem;font-weight:500}
@@ -371,14 +372,14 @@
           }
           var forsta = items[0], resten = items.slice(1, 4);
           var fdm = dagMan(forsta.datum);
-          var html = '<div class="next-hero"><div class="nh-tag">Nästa</div><div class="nh-row">' +
+          var html = '<a class="next-hero" href="kommande/#ev-' + forsta.id + '"><div class="nh-tag">Nästa</div><div class="nh-row">' +
             '<div class="nh-date"><span class="d">' + fdm.d + '</span><span class="m">' + esc(fdm.m) + '</span></div>' +
             '<div class="nh-body"><div class="nh-top"><h3>' + esc(forsta.rubrik) + '</h3>' + pill(forsta.typ) + '</div>' +
-            metaRad(forsta) + '</div></div></div>';
+            metaRad(forsta) + '</div></div></a>';
           if (resten.length) {
             html += '<div class="rest">' + resten.map(function (ev) {
-              return '<div class="r"><div class="r-date">' + esc(kortDatum(ev.datum)) + '</div>' +
-                '<h3>' + esc(ev.rubrik) + '</h3>' + pill(ev.typ) + '</div>';
+              return '<a class="r" href="kommande/#ev-' + ev.id + '"><div class="r-date">' + esc(kortDatum(ev.datum)) + '</div>' +
+                '<h3>' + esc(ev.rubrik) + '</h3>' + pill(ev.typ) + '</a>';
             }).join('') + '</div>';
           }
           evLista.innerHTML = html;
