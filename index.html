@@ -77,6 +77,35 @@
   .news-more{margin-top:28px}
   @media(max-width:600px){.news article{grid-template-columns:1fr;gap:8px}}
 
+  /* Kommande (evenemang) – "nästa" framhävt + kompakt lista */
+  .pill{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:100px;font-weight:600;white-space:nowrap}
+  .pill.mote   {background:rgba(242,194,0,.16); color:var(--gold-soft);border:1px solid rgba(242,194,0,.4)}
+  .pill.contest{background:rgba(27,86,176,.24); color:#9dc0f2;       border:1px solid rgba(27,86,176,.6)}
+  .pill.faltdag{background:rgba(46,160,110,.18);color:#7fd8ad;       border:1px solid rgba(46,160,110,.5)}
+  .pill.kurs   {background:rgba(120,180,240,.16);color:#bcd8f6;      border:1px solid rgba(120,180,240,.4)}
+  .pill.ovrigt {background:rgba(142,164,189,.14);color:var(--muted); border:1px solid rgba(142,164,189,.35)}
+  .ev-meta{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.78rem;color:var(--muted);letter-spacing:.03em}
+  .ev-meta span+span::before{content:"·";margin:0 8px;color:var(--line)}
+  .next-hero{background:var(--navy-2);border:1px solid var(--line);border-left:3px solid var(--gold);padding:30px 34px;margin-bottom:1px}
+  .next-hero .nh-tag{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  .next-hero .nh-row{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
+  .next-hero .nh-date{text-align:center;font-family:"Helvetica Neue",Arial,sans-serif;line-height:1}
+  .next-hero .nh-date .d{font-size:3rem;font-weight:600;color:var(--gold-soft);display:block}
+  .next-hero .nh-date .m{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:6px;display:block}
+  .next-hero .nh-body h3{font-size:1.5rem;font-weight:500;margin-bottom:8px}
+  .next-hero .nh-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+  .rest{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-top:none}
+  .rest .r{background:var(--navy-2);padding:16px 30px;display:grid;grid-template-columns:64px 1fr auto;gap:20px;align-items:center;transition:background .2s}
+  .rest .r:hover{background:var(--navy-3)}
+  .rest .r-date{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.82rem;color:var(--gold-soft);letter-spacing:.04em}
+  .rest .r h3{font-size:1rem;font-weight:500}
+  .events-more{margin-top:28px}
+  @media(max-width:600px){
+    .next-hero .nh-row{grid-template-columns:1fr;gap:14px;text-align:left}
+    .next-hero .nh-date{text-align:left}
+    .rest .r{grid-template-columns:1fr;gap:6px}
+  }
+
   /* timeline */
   .timeline{list-style:none;max-width:720px}
   .timeline li{display:grid;grid-template-columns:96px 1fr;gap:28px;padding:22px 0;border-bottom:1px solid var(--line);align-items:baseline}
@@ -125,6 +154,7 @@
       <a class="call-link" href="#top"><span class="call"><img src="logo.svg" alt="GSA">SK6AG · Göteborgs Sändareamatörer</span></a>
       <nav>
         <a href="#moten">Möten</a>
+        <a href="#kommande">Kommande</a>
         <a href="#vadvigor">Vad vi gör</a>
         <a href="#nytt">Nytt</a>
         <a href="#historik">Historik</a>
@@ -175,6 +205,18 @@
           <a href="#kontakt" class="btn btn-ghost">Kontakta oss</a>
         </div>
         <p class="market-note" style="margin-top:18px">Årsmöte hålls i början av februari. Exakta datum meddelas under Nytt och via klubbens utskick.</p>
+      </div>
+    </section>
+
+    <!-- KOMMANDE (evenemang) -->
+    <section id="kommande">
+      <div class="wrap">
+        <div class="sec-label">Kommande</div>
+        <h2>Vad händer härnäst</h2>
+        <div id="events-list">
+          <div class="next-hero"><div class="nh-tag">Nästa</div><div class="nh-row"><div class="nh-body"><p style="color:var(--muted)">Laddar kommande…</p></div></div></div>
+        </div>
+        <div class="events-more"><a href="kommande/">Se alla kommande &rarr;</a></div>
       </div>
     </section>
 
@@ -297,6 +339,57 @@
       .catch(function () {
         lista.innerHTML = '<article><div class="date">&nbsp;</div><div class="nbody"><p style="color:var(--muted)">Kunde inte ladda nyheter just nu.</p></div></article>';
       });
+
+    // --- Kommande evenemang: nästa framhävt + kompakt lista (upplägg C) ---
+    var TYPER = { mote:'Möte', contest:'Contest', faltdag:'Fältdag', kurs:'Kurs', ovrigt:'Övrigt' };
+    function dagMan(iso) {
+      var d = new Date(iso + 'T00:00:00');
+      if (isNaN(d)) return { d: '', m: '' };
+      return { d: ('0' + d.getDate()).slice(-2), m: MANADER[d.getMonth()] };
+    }
+    function kortDatum(iso) {
+      var dm = dagMan(iso);
+      return dm.d.replace(/^0/, '') + ' ' + dm.m;
+    }
+    function metaRad(ev) {
+      var bitar = [];
+      if (ev.tid) bitar.push(esc(ev.tid));
+      if (ev.plats) bitar.push(esc(ev.plats));
+      if (!bitar.length) return '';
+      return '<div class="ev-meta">' + bitar.map(function (b) { return '<span>' + b + '</span>'; }).join('') + '</div>';
+    }
+    function pill(typ) {
+      var t = TYPER[typ] ? typ : 'ovrigt';
+      return '<span class="pill ' + t + '">' + TYPER[t] + '</span>';
+    }
+    var evLista = document.getElementById('events-list');
+    if (evLista) {
+      fetch('/api/events?scope=upcoming')
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (data) {
+          var items = (data && data.evenemang) || [];
+          if (!items.length) {
+            evLista.innerHTML = '<div class="next-hero"><div class="nh-tag">Nästa</div><div class="nh-row"><div class="nh-body"><p style="color:var(--muted)">Inga inplanerade evenemang just nu.</p></div></div></div>';
+            return;
+          }
+          var forsta = items[0], resten = items.slice(1, 4);
+          var fdm = dagMan(forsta.datum);
+          var html = '<div class="next-hero"><div class="nh-tag">Nästa</div><div class="nh-row">' +
+            '<div class="nh-date"><span class="d">' + fdm.d + '</span><span class="m">' + esc(fdm.m) + '</span></div>' +
+            '<div class="nh-body"><div class="nh-top"><h3>' + esc(forsta.rubrik) + '</h3>' + pill(forsta.typ) + '</div>' +
+            metaRad(forsta) + '</div></div></div>';
+          if (resten.length) {
+            html += '<div class="rest">' + resten.map(function (ev) {
+              return '<div class="r"><div class="r-date">' + esc(kortDatum(ev.datum)) + '</div>' +
+                '<h3>' + esc(ev.rubrik) + '</h3>' + pill(ev.typ) + '</div>';
+            }).join('') + '</div>';
+          }
+          evLista.innerHTML = html;
+        })
+        .catch(function () {
+          evLista.innerHTML = '<div class="next-hero"><div class="nh-tag">Nästa</div><div class="nh-row"><div class="nh-body"><p style="color:var(--muted)">Kunde inte ladda kommande just nu.</p></div></div></div>';
+        });
+    }
   })();
   </script>
 </body>
