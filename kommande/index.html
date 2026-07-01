@@ -42,7 +42,7 @@
 
   .events{display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
   .events .ev{background:var(--navy-2);padding:22px 28px;display:grid;grid-template-columns:78px 1fr;gap:24px;align-items:baseline;transition:background .2s;scroll-margin-top:90px}
-  .events .ev:target{background:var(--navy-3);box-shadow:inset 3px 0 0 var(--gold)}
+  .events .ev:target,.events .ev.markerad{background:var(--navy-3);box-shadow:inset 3px 0 0 var(--gold)}
   .events .ev:hover{background:var(--navy-3)}
   .ev .day{font-family:"Helvetica Neue",Arial,sans-serif;text-align:center;line-height:1}
   .ev .day .d{font-size:1.7rem;font-weight:600;color:var(--gold-soft);display:block}
@@ -152,6 +152,12 @@
       .then(function(data){
         var items=(data&&data.evenemang)||[];
         document.getElementById('upcoming').innerHTML=renderaGrupperat(items);
+        // Eventen ritas ut efter fetch, så webbläsarens egna hash-hopp vid
+        // sidladdning missar. Scrolla dit manuellt när målet finns i DOM:en.
+        if (location.hash) {
+          var mal = document.getElementById(location.hash.slice(1));
+          if (mal) { mal.scrollIntoView(); mal.classList.add('markerad'); }
+        }
       })
       .catch(function(){document.getElementById('upcoming').innerHTML='<p class="tom">Kunde inte ladda kommande just nu.</p>';});
 
