@@ -11,3 +11,4 @@ npm-debug.log*
 
 # Lokala Decap-tester
 .decap-server/
+.wrangler
