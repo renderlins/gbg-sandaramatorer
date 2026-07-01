@@ -134,6 +134,15 @@
 
   /* kontakt */
   .cta .prose{margin-bottom:30px}
+  .kontakt-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:6px 0 30px}
+  .kontakt-kort{background:var(--navy-2);border:1px solid var(--line);border-left:3px solid var(--gold);padding:24px 26px}
+  .kontakt-kort .etikett{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  .kontakt-kort .stor{font-size:1.15rem;color:var(--paper);margin-bottom:4px}
+  .kontakt-kort .stor a{color:var(--gold-soft);text-decoration:none}
+  .kontakt-kort .stor a:hover{text-decoration:underline}
+  .kontakt-kort p{color:#c3d0dd;font-size:.96rem;margin:0}
+  .kontakt-knappar{display:flex;gap:14px;flex-wrap:wrap}
+  @media(max-width:760px){.kontakt-grid{grid-template-columns:1fr}}
 
   footer{padding:40px 0;border-top:1px solid var(--line);text-align:center;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.74rem;letter-spacing:.1em;color:var(--muted)}
   footer .links{margin-bottom:14px}
@@ -290,10 +299,27 @@
     <!-- KONTAKT -->
     <section id="kontakt" class="cta">
       <div class="wrap">
-        <div class="sec-label">Bli medlem</div>
+        <div class="sec-label">Kontakta oss</div>
         <h2>Vill du vara med?</h2>
         <div class="prose"><p>Oavsett om du redan har certifikat eller bara är nyfiken på amatörradio är du välkommen att höra av dig. Vi hjälper gärna nya att komma igång — och att ta certifikatet.</p></div>
-        <a href="mailto:info@sk6ag.org" class="btn btn-primary">Kontakta oss</a>
+
+        <div class="kontakt-grid">
+          <div class="kontakt-kort">
+            <div class="etikett">E-post</div>
+            <div class="stor"><a href="mailto:info@sk6ag.org">info@sk6ag.org</a></div>
+            <p>Skriv till oss så svarar vi så snart vi kan.</p>
+          </div>
+          <div class="kontakt-kort">
+            <div class="etikett">Var vi träffas</div>
+            <div class="stor">Radiomuseet, Göteborg</div>
+            <p>Vi ses på månadsmötena — se Kommande för datum och tid.</p>
+          </div>
+        </div>
+
+        <div class="kontakt-knappar">
+          <a href="mailto:info@sk6ag.org" class="btn btn-primary">Mejla oss</a>
+          <a href="medlem/" class="btn btn-ghost">Bli medlem eller ställ en fråga</a>
+        </div>
       </div>
     </section>
 
