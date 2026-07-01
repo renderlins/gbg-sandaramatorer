@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Konton – SK6AG admin</title>
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<style>
+  :root{
+    --navy:#0c2747; --navy-2:#103154; --navy-3:#0a2039;
+    --cobalt:#1b56b0; --gold:#f2c200; --gold-soft:#f6d75a;
+    --paper:#eef3f8; --muted:#8ea4bd; --line:rgba(242,194,0,.22);
+    --fel:#ff8d7a; --ok:#7ad19b;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--navy); color:var(--paper); font-family:"Helvetica Neue",Arial,sans-serif; line-height:1.55; min-height:100vh}
+  a{color:var(--gold-soft)}
+  .topp{border-bottom:1px solid var(--line); padding:18px 26px; display:flex; align-items:center; gap:14px}
+  .topp .hem-lank{display:flex; align-items:center; gap:14px; text-decoration:none; color:inherit}
+  .topp .hem-lank:hover .ord{color:var(--gold-soft)}
+  .topp .topp-logo{width:34px; height:34px; display:block}
+  .topp .ord{font-weight:600}
+  .topp .ord b{color:var(--gold)}
+  .wrap{max-width:680px; margin:0 auto; padding:40px 22px}
+
+  h1{font-size:1.5rem; font-weight:600; margin-bottom:4px}
+  .underrubrik{color:var(--muted); font-size:.95rem; margin-bottom:8px}
+  .tillbaka{display:inline-block; margin-bottom:22px; font-size:.9rem; text-decoration:none}
+  .kort{background:var(--navy-2); border:1px solid var(--line); border-radius:14px; padding:26px; margin-bottom:22px}
+  h2{font-size:1.1rem; font-weight:600; margin-bottom:16px}
+
+  label{display:block; font-size:.74rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; margin-top:14px}
+  input{width:100%; background:var(--navy-3); border:1px solid var(--line); color:var(--paper); border-radius:8px; padding:11px 13px; font:inherit; color-scheme:dark}
+  input:focus{outline:2px solid var(--gold); outline-offset:1px; border-color:transparent}
+  .knapp{background:var(--gold); color:var(--navy-3); border:none; border-radius:8px; padding:11px 18px; font:inherit; font-weight:600; cursor:pointer; margin-top:16px}
+  .knapp:hover{background:var(--gold-soft)}
+  .knapp:disabled{opacity:.6; cursor:default}
+  .knapp.spok{background:transparent; color:var(--gold-soft); border:1px solid var(--line); margin-top:0}
+
+  .melding{font-size:.92rem; margin:14px 0 0; padding:10px 14px; border-radius:8px; display:none}
+  .melding.fel{display:block; background:rgba(255,141,122,.12); color:var(--fel)}
+  .melding.ok{display:block; background:rgba(122,209,155,.12); color:var(--ok)}
+
+  .konto{background:var(--navy-3); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap}
+  .konto .epost{font-weight:600}
+  .konto .jag-tag{font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gold-soft); margin-left:8px}
+  .konto .knappar{display:flex; gap:8px}
+  .k-aterstall{background:none; border:1px solid var(--line); color:var(--gold-soft); cursor:pointer; font:inherit; font-size:.82rem; border-radius:8px; padding:6px 12px}
+  .k-aterstall:hover{background:var(--navy-2)}
+  .k-ta{background:none; border:none; color:var(--fel); cursor:pointer; font:inherit; font-size:.82rem; opacity:.7}
+  .k-ta:hover{opacity:1}
+
+  .losen-visa{background:rgba(242,194,0,.1); border:1px solid rgba(242,194,0,.4); border-radius:10px; padding:16px 18px; margin-top:14px; display:none}
+  .losen-visa.syns{display:block}
+  .losen-visa .kod{font-size:1.4rem; font-weight:700; letter-spacing:.08em; color:var(--gold-soft); margin:8px 0; font-family:"SF Mono",Menlo,monospace}
+  .losen-visa .info{font-size:.86rem; color:var(--muted)}
+
+  .laddar,.ejinlogg{text-align:center; padding:60px 20px; color:var(--muted)}
+  .doldt{display:none !important}
+</style>
+</head>
+<body>
+  <div class="topp">
+    <a class="hem-lank" href="../index.html" title="Till admin">
+      <img class="topp-logo" src="../../favicon.svg" alt="GSA">
+      <span class="ord"><b>SK6AG</b> · Kontohantering</span>
+    </a>
+  </div>
+
+  <div class="wrap">
+
+    <div class="laddar" id="laddar">Kontrollerar inloggning…</div>
+
+    <div class="ejinlogg doldt" id="ejinlogg">
+      Du måste vara inloggad i admin för att hantera konton.<br><br>
+      <a href="../index.html">Gå till inloggningen →</a>
+    </div>
+
+    <div class="doldt" id="innehall">
+      <a class="tillbaka" href="../index.html">‹ Tillbaka till admin</a>
+      <h1>Konton</h1>
+      <p class="underrubrik">Adminkonton som kan logga in och hantera sajten. Skapa gärna minst två så ni kan hjälpa varandra om någon låser sig.</p>
+
+      <div class="melding" id="melding"></div>
+
+      <div class="kort">
+        <h2>Befintliga konton</h2>
+        <div id="kontolista">Laddar…</div>
+        <div class="losen-visa" id="losen-visa">
+          <div class="info">Nytt tillfälligt lösenord för <b id="losen-epost"></b>:</div>
+          <div class="kod" id="losen-kod"></div>
+          <div class="info">Läs upp det för personen. Det visas bara nu – be dem byta lösenord efter inloggning. (Byte av eget lösenord görs genom att återställa sitt konto.)</div>
+        </div>
+      </div>
+
+      <div class="kort">
+        <h2>Skapa nytt konto</h2>
+        <label for="ny-epost">E-post</label>
+        <input type="email" id="ny-epost" placeholder="namn@exempel.se" autocomplete="off">
+        <label for="ny-losen">Lösenord (minst 8 tecken)</label>
+        <input type="text" id="ny-losen" placeholder="Välj ett lösenord" autocomplete="off">
+        <button class="knapp" id="skapa-knapp">Skapa konto</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+  (function(){
+    var melding = document.getElementById('melding');
+    function visaMelding(typ, text){ melding.className='melding '+typ; melding.textContent=text; }
+    function rensa(){ melding.className='melding'; melding.textContent=''; }
+    function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+    // Kontrollera inloggning först.
+    fetch('/api/me')
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        document.getElementById('laddar').classList.add('doldt');
+        if (res.ok && res.d.inloggad){
+          document.getElementById('innehall').classList.remove('doldt');
+          laddaKonton();
+        } else {
+          document.getElementById('ejinlogg').classList.remove('doldt');
+        }
+      })
+      .catch(function(){
+        document.getElementById('laddar').classList.add('doldt');
+        document.getElementById('ejinlogg').classList.remove('doldt');
+      });
+
+    function laddaKonton(){
+      fetch('/api/accounts')
+        .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+        .then(function(res){
+          var lista = document.getElementById('kontolista');
+          if (!res.ok){ lista.innerHTML = 'Kunde inte ladda konton.'; return; }
+          var konton = (res.d && res.d.konton) || [];
+          lista.innerHTML = konton.map(function(k){
+            var jag = k.jag ? '<span class="jag-tag">Du</span>' : '';
+            var raderaKnapp = k.jag ? '' : '<button class="k-ta" data-ta="'+k.id+'" data-epost="'+esc(k.email)+'">Ta bort</button>';
+            return '<div class="konto">'+
+              '<span class="epost">'+esc(k.email)+jag+'</span>'+
+              '<div class="knappar">'+
+              '<button class="k-aterstall" data-aterstall="'+k.id+'">Återställ lösenord</button>'+
+              raderaKnapp +
+              '</div></div>';
+          }).join('');
+          [].forEach.call(lista.querySelectorAll('button[data-aterstall]'), function(b){
+            b.addEventListener('click', function(){ aterstall(b.getAttribute('data-aterstall')); });
+          });
+          [].forEach.call(lista.querySelectorAll('button[data-ta]'), function(b){
+            b.addEventListener('click', function(){ taBort(b.getAttribute('data-ta'), b.getAttribute('data-epost')); });
+          });
+        });
+    }
+
+    function aterstall(id){
+      if (!confirm('Återställa lösenordet? Personen loggas ut och får ett nytt tillfälligt lösenord.')) return;
+      rensa();
+      fetch('/api/accounts/'+id, { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' })
+        .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+        .then(function(res){
+          if (res.ok){
+            document.getElementById('losen-epost').textContent = res.d.epost;
+            document.getElementById('losen-kod').textContent = res.d.tillfalligt;
+            document.getElementById('losen-visa').classList.add('syns');
+            document.getElementById('losen-visa').scrollIntoView({ block:'center', behavior:'smooth' });
+          } else {
+            visaMelding('fel', res.d.fel || 'Kunde inte återställa.');
+          }
+        })
+        .catch(function(){ visaMelding('fel','Något gick fel. Försök igen.'); });
+    }
+
+    function taBort(id, epost){
+      if (!confirm('Ta bort kontot '+epost+'? Detta går inte att ångra.')) return;
+      rensa();
+      fetch('/api/accounts/'+id, { method:'DELETE' })
+        .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+        .then(function(res){
+          if (res.ok){ visaMelding('ok','Kontot är borttaget.'); laddaKonton(); }
+          else { visaMelding('fel', res.d.fel || 'Kunde inte ta bort.'); }
+        });
+    }
+
+    document.getElementById('skapa-knapp').addEventListener('click', function(){
+      rensa();
+      var epost = document.getElementById('ny-epost').value.trim();
+      var losen = document.getElementById('ny-losen').value.trim();
+      if (!epost || !losen){ visaMelding('fel','Fyll i e-post och lösenord.'); return; }
+      if (losen.length < 8){ visaMelding('fel','Lösenordet måste vara minst 8 tecken.'); return; }
+      var knapp = this; knapp.disabled = true;
+      fetch('/api/accounts', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ epost:epost, losenord:losen })
+      })
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        knapp.disabled = false;
+        if (res.ok){
+          visaMelding('ok','Kontot är skapat.');
+          document.getElementById('ny-epost').value='';
+          document.getElementById('ny-losen').value='';
+          laddaKonton();
+        } else {
+          visaMelding('fel', res.d.fel || 'Kunde inte skapa konto.');
+        }
+      })
+      .catch(function(){ knapp.disabled = false; visaMelding('fel','Något gick fel. Försök igen.'); });
+    });
+  })();
+  </script>
+</body>
+</html>
