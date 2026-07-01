@@ -168,6 +168,28 @@
     padding:0 6px; margin-left:8px; border-radius:100px; background:var(--gold); color:var(--navy-3);
     font-size:.72rem; font-weight:700; vertical-align:middle}
 
+  /* Repeater/SDR-formulär */
+  .tva-kol{display:grid; grid-template-columns:1fr 1fr; gap:0 16px}
+  @media(max-width:560px){.tva-kol{grid-template-columns:1fr}}
+  .kryssrad{display:flex; align-items:center; gap:10px; text-transform:none; letter-spacing:0; color:var(--paper); font-size:.95rem; margin-top:8px}
+  .kryssrad input{width:18px; height:18px; accent-color:var(--gold)}
+  .visa-mer{background:none; border:none; color:var(--gold-soft); cursor:pointer; font:inherit; font-size:.9rem; padding:14px 0 6px; display:block}
+  .specar-block{border-left:2px solid var(--line); padding-left:16px; margin:6px 0}
+  .form-knappar{display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap}
+  .rep-rad{background:var(--navy-3); border:1px solid var(--line); border-radius:10px; padding:12px 16px; margin-bottom:10px;
+    display:grid; grid-template-columns:auto 1fr auto auto; gap:14px; align-items:center}
+  .rep-rad .r-namn{font-weight:600}
+  .rep-rad .r-frq{color:var(--gold-soft); font-size:.9rem; font-family:"Helvetica Neue",Arial,sans-serif}
+  .st-pill{font-size:.64rem; letter-spacing:.08em; text-transform:uppercase; padding:3px 9px; border-radius:100px; font-weight:600; white-space:nowrap}
+  .st-pill.drift{background:rgba(122,209,155,.16); color:var(--ok); border:1px solid rgba(122,209,155,.4)}
+  .st-pill.ur_drift{background:rgba(255,141,122,.14); color:var(--fel); border:1px solid rgba(255,141,122,.4)}
+  .st-pill.underhall{background:rgba(242,194,0,.14); color:var(--gold-soft); border:1px solid rgba(242,194,0,.35)}
+  .r-red{background:none; border:1px solid var(--line); color:var(--gold-soft); cursor:pointer; font:inherit; font-size:.8rem; border-radius:8px; padding:6px 11px}
+  .r-red:hover{background:var(--navy-2)}
+  .r-ta{background:none; border:none; color:var(--fel); cursor:pointer; font:inherit; font-size:.8rem; opacity:.7}
+  .r-ta:hover{opacity:1}
+  @media(max-width:560px){.rep-rad{grid-template-columns:1fr auto; gap:8px}}
+
   /* Diskret kontolänk längst ner i admin */
   .konto-lank{margin-top:24px; padding-top:18px; border-top:1px solid var(--line); text-align:right}
   .konto-lank a{color:var(--muted); font-size:.84rem; text-decoration:none}
@@ -228,6 +250,8 @@
           <button class="snav" data-pane="pane-news">Nyheter</button>
           <button class="snav" data-pane="pane-medlem">Medlemmar</button>
           <button class="snav" data-pane="pane-forfr">Förfrågningar<span class="badge doldt" id="forfr-badge">0</span></button>
+          <button class="snav" data-pane="pane-rep">Repeatrar</button>
+          <button class="snav" data-pane="pane-sdr">SDR-mottagare</button>
           <button class="snav senare" disabled>Köp &amp; sälj<span class="taggen">Kommer senare</span></button>
         </nav>
 
@@ -318,6 +342,95 @@
             <div id="forfrlista"></div>
           </div>
 
+          <!-- Pane: Repeatrar -->
+          <div class="pane" id="pane-rep">
+            <h1>Repeatrar</h1>
+            <p class="underrubrik">Driver frekvenstabellen och tekniken på repeatersidan, samt kryssrutorna i felanmälan.</p>
+
+            <div id="rep-form-titel" class="litet" style="margin-bottom:8px">Ny repeater</div>
+            <input type="hidden" id="rep-id" value="">
+            <label for="rep-namn">Namn</label>
+            <input type="text" id="rep-namn" placeholder="t.ex. DMR SK6AG">
+            <div class="tva-kol">
+              <div><label for="rep-anrop">Anropssignal</label><input type="text" id="rep-anrop" placeholder="SK6AG"></div>
+              <div><label for="rep-band">Band</label><input type="text" id="rep-band" placeholder="70 cm"></div>
+            </div>
+            <div class="tva-kol">
+              <div><label for="rep-frekvens">Frekvens</label><input type="text" id="rep-frekvens" placeholder="434.7875 MHz"></div>
+              <div><label for="rep-lage">Läge / mode</label><input type="text" id="rep-lage" placeholder="DMR"></div>
+            </div>
+            <label for="rep-kanal">Kanal / info</label>
+            <input type="text" id="rep-kanal" placeholder="t.ex. RU383 (−2 MHz), CC6">
+            <div class="tva-kol">
+              <div><label for="rep-plats">Plats</label><input type="text" id="rep-plats" placeholder="Guldheden"></div>
+              <div><label for="rep-status">Status</label><select id="rep-status">
+                <option value="drift">I drift</option>
+                <option value="underhall">Underhåll</option>
+                <option value="ur_drift">Ur drift</option>
+              </select></div>
+            </div>
+            <div class="tva-kol">
+              <div><label for="rep-sort">Sortering (lägre först)</label><input type="number" id="rep-sort" placeholder="100"></div>
+              <div><label style="margin-top:14px">Visa i felanmälan</label>
+                <label class="kryssrad"><input type="checkbox" id="rep-felanm" checked> Ja, som kryssruta</label></div>
+            </div>
+
+            <button type="button" class="visa-mer" id="rep-visa-specar">▸ Tekniska specifikationer</button>
+            <div class="specar-block doldt" id="rep-specar">
+              <label for="rep-tx-antenn">TX-antenn</label><input type="text" id="rep-tx-antenn">
+              <label for="rep-tx-matare">TX-matare</label><input type="text" id="rep-tx-matare">
+              <label for="rep-sandare">Sändare</label><input type="text" id="rep-sandare">
+              <label for="rep-slutsteg">Slutsteg</label><input type="text" id="rep-slutsteg">
+              <label for="rep-rx-antenn">RX-antenn</label><input type="text" id="rep-rx-antenn">
+              <label for="rep-rx-matare">RX-matare</label><input type="text" id="rep-rx-matare">
+              <label for="rep-mottagare">Mottagare</label><input type="text" id="rep-mottagare">
+              <label for="rep-oppning">Öppningston</label><input type="text" id="rep-oppning">
+              <label for="rep-logik">Logik / not</label><textarea id="rep-logik"></textarea>
+            </div>
+
+            <div class="form-knappar">
+              <button class="knapp" id="spara-rep-knapp">Lägg till repeater</button>
+              <button class="knapp spok doldt" id="avbryt-rep-knapp">Avbryt redigering</button>
+            </div>
+
+            <div class="delare"></div>
+            <p class="litet">Repeatrar</p>
+            <div id="replista"></div>
+          </div>
+
+          <!-- Pane: SDR-mottagare -->
+          <div class="pane" id="pane-sdr">
+            <h1>SDR-mottagare</h1>
+            <p class="underrubrik">Klubbens nätanslutna mottagare. Visas som kryssrutor i felanmälan.</p>
+
+            <div id="sdr-form-titel" class="litet" style="margin-bottom:8px">Ny mottagare</div>
+            <input type="hidden" id="sdr-id" value="">
+            <label for="sdr-namn">Namn</label>
+            <input type="text" id="sdr-namn" placeholder="t.ex. Svenljunga">
+            <div class="tva-kol">
+              <div><label for="sdr-plats">Plats <span style="text-transform:none;letter-spacing:0;color:var(--muted)">(valfritt)</span></label><input type="text" id="sdr-plats"></div>
+              <div><label for="sdr-frekvens">Frekvens <span style="text-transform:none;letter-spacing:0;color:var(--muted)">(valfritt)</span></label><input type="text" id="sdr-frekvens"></div>
+            </div>
+            <div class="tva-kol">
+              <div><label for="sdr-status">Status</label><select id="sdr-status">
+                <option value="drift">I drift</option>
+                <option value="underhall">Underhåll</option>
+                <option value="ur_drift">Ur drift</option>
+              </select></div>
+              <div><label for="sdr-sort">Sortering</label><input type="number" id="sdr-sort" placeholder="100"></div>
+            </div>
+            <label class="kryssrad"><input type="checkbox" id="sdr-felanm" checked> Visa i felanmälan</label>
+
+            <div class="form-knappar">
+              <button class="knapp" id="spara-sdr-knapp">Lägg till mottagare</button>
+              <button class="knapp spok doldt" id="avbryt-sdr-knapp">Avbryt redigering</button>
+            </div>
+
+            <div class="delare"></div>
+            <p class="litet">Mottagare</p>
+            <div id="sdrlista"></div>
+          </div>
+
         </div>
       </div>
 
@@ -369,6 +482,8 @@
     laddaEvenemang();
     laddaMedlemmar();
     laddaForfragningar();
+    laddaRepeatrar();
+    laddaSdr();
   }
 
   // --- Sidomeny: växla pane ---
@@ -740,6 +855,7 @@
           return;
         }
         lista.innerHTML = items.map(function(f){
+          var arFel = (f.arende === 'felanmalan');
           var taggar = [];
           if (f.vill_bli_medlem) taggar.push('Vill bli medlem');
           if (f.bidrag_repeater) taggar.push('Bidrag repeater/SDR');
@@ -748,11 +864,13 @@
           var taggHtml = taggar.length ? '<div class="taggar">'+taggar.map(function(t){return '<span class="f-tag">'+esc(t)+'</span>';}).join('')+'</div>' : '';
           var call = f.callsign ? '<span class="call">'+esc(f.callsign)+'</span>' : '';
           var medd = f.meddelande ? '<div class="medd">'+esc(f.meddelande)+'</div>' : '';
+          var arendeMärke = arFel ? '<span class="f-tag" style="background:rgba(255,141,122,.14);color:var(--fel);border-color:rgba(255,141,122,.4)">Felanmälan</span>' : '';
+          var gallerHtml = (arFel && f.galler) ? '<div class="medd" style="color:var(--gold-soft)"><b>Gäller:</b> '+esc(f.galler)+'</div>' : '';
           return '<div class="forfr'+(f.hanterad?' klar':'')+'">'+
-            '<div class="topp"><div class="namn">'+esc(f.namn)+call+'</div>'+
+            '<div class="topp"><div class="namn">'+esc(f.namn)+call+' '+arendeMärke+'</div>'+
             '<div class="datum">'+esc(svDatum((f.skapad||'').slice(0,10)))+'</div></div>'+
             '<div class="epost"><a href="mailto:'+esc(f.epost)+'">'+esc(f.epost)+'</a></div>'+
-            taggHtml + medd +
+            gallerHtml + taggHtml + medd +
             '<div class="knappar">'+
             '<button class="f-klar" data-klar="'+f.id+'" data-nu="'+(f.hanterad?1:0)+'">'+(f.hanterad?'Markera ohanterad':'Markera hanterad')+'</button>'+
             '<button class="f-ta" data-fta="'+f.id+'">Ta bort</button>'+
@@ -786,6 +904,198 @@
       .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
       .then(function(res){
         if (res.ok){ laddaForfragningar(); }
+        else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
+      });
+  }
+
+  // ====================== REPEATRAR ======================
+  var STATUS_TEXT = { drift:'I drift', ur_drift:'Ur drift', underhall:'Underhåll' };
+  var REP_FALT = ['namn','anrop','band','frekvens','lage','kanal','plats','tx-antenn','tx-matare','sandare','slutsteg','rx-antenn','rx-matare','mottagare','oppning','logik'];
+  // Mappning fält-id → API-nyckel
+  var REP_MAP = { 'namn':'namn','anrop':'anropssignal','band':'band','frekvens':'frekvens','lage':'lage','kanal':'kanal_info','plats':'plats',
+    'tx-antenn':'tx_antenn','tx-matare':'tx_matare','sandare':'sandare','slutsteg':'slutsteg','rx-antenn':'rx_antenn','rx-matare':'rx_matare','mottagare':'mottagare','oppning':'oppningston','logik':'logik_not' };
+
+  function laddaRepeatrar(){
+    fetch('/api/repeaters')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var lista = document.getElementById('replista');
+        var items = (data && data.repeatrar) || [];
+        if (!items.length){ lista.innerHTML = '<p class="litet">Inga repeatrar ännu.</p>'; return; }
+        lista.innerHTML = items.map(function(rp){
+          var st = STATUS_TEXT[rp.status] ? rp.status : 'drift';
+          return '<div class="rep-rad">'+
+            '<span class="r-namn">'+esc(rp.namn)+'</span>'+
+            '<span class="r-frq">'+esc(rp.frekvens || '')+'</span>'+
+            '<span class="st-pill '+st+'">'+STATUS_TEXT[st]+'</span>'+
+            '<span style="display:flex;gap:8px">'+
+            '<button class="r-red" data-red-rep="'+rp.id+'">Redigera</button>'+
+            '<button class="r-ta" data-ta-rep="'+rp.id+'">Ta bort</button>'+
+            '</span></div>';
+        }).join('');
+        window._repeatrar = items;
+        [].forEach.call(lista.querySelectorAll('button[data-red-rep]'), function(b){
+          b.addEventListener('click', function(){ redigeraRep(b.getAttribute('data-red-rep')); });
+        });
+        [].forEach.call(lista.querySelectorAll('button[data-ta-rep]'), function(b){
+          b.addEventListener('click', function(){ taBortRep(b.getAttribute('data-ta-rep')); });
+        });
+      });
+  }
+
+  function repFaltEl(f){ return document.getElementById('rep-'+f); }
+  function rensaRepForm(){
+    document.getElementById('rep-id').value = '';
+    REP_FALT.forEach(function(f){ repFaltEl(f).value = ''; });
+    document.getElementById('rep-status').value = 'drift';
+    document.getElementById('rep-sort').value = '';
+    document.getElementById('rep-felanm').checked = true;
+    document.getElementById('rep-form-titel').textContent = 'Ny repeater';
+    document.getElementById('spara-rep-knapp').textContent = 'Lägg till repeater';
+    document.getElementById('avbryt-rep-knapp').classList.add('doldt');
+  }
+  function redigeraRep(id){
+    var rp = (window._repeatrar || []).filter(function(x){ return String(x.id) === String(id); })[0];
+    if (!rp) return;
+    document.getElementById('rep-id').value = rp.id;
+    REP_FALT.forEach(function(f){ repFaltEl(f).value = rp[REP_MAP[f]] || ''; });
+    document.getElementById('rep-status').value = rp.status || 'drift';
+    document.getElementById('rep-sort').value = (rp.sortering !== null && rp.sortering !== undefined) ? rp.sortering : '';
+    document.getElementById('rep-felanm').checked = !!rp.i_felanmalan;
+    document.getElementById('rep-form-titel').textContent = 'Redigerar: ' + rp.namn;
+    document.getElementById('spara-rep-knapp').textContent = 'Spara ändringar';
+    document.getElementById('avbryt-rep-knapp').classList.remove('doldt');
+    document.getElementById('pane-rep').scrollIntoView({ block:'start', behavior:'smooth' });
+  }
+  document.getElementById('avbryt-rep-knapp').addEventListener('click', rensaRepForm);
+  document.getElementById('rep-visa-specar').addEventListener('click', function(){
+    document.getElementById('rep-specar').classList.toggle('doldt');
+  });
+
+  document.getElementById('spara-rep-knapp').addEventListener('click', function(){
+    rensaMelding(adminMelding);
+    var namn = repFaltEl('namn').value.trim();
+    if (!namn){ melding(adminMelding,'fel','Ange ett namn för repeatern.'); return; }
+    var payload = {};
+    REP_FALT.forEach(function(f){ payload[REP_MAP[f]] = repFaltEl(f).value.trim(); });
+    payload.status = document.getElementById('rep-status').value;
+    payload.i_felanmalan = document.getElementById('rep-felanm').checked;
+    var sort = document.getElementById('rep-sort').value.trim();
+    if (sort !== '') payload.sortering = sort;
+    var id = document.getElementById('rep-id').value;
+    var url = id ? '/api/repeaters/'+id : '/api/repeaters';
+    var metod = id ? 'PATCH' : 'POST';
+    var knapp = this; knapp.disabled = true;
+    fetch(url, { method:metod, headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        knapp.disabled = false;
+        if (res.ok){ melding(adminMelding,'ok', id ? 'Ändringarna är sparade.' : 'Repeatern är tillagd.'); rensaRepForm(); laddaRepeatrar(); }
+        else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte spara.'); }
+      })
+      .catch(function(){ knapp.disabled = false; melding(adminMelding,'fel','Något gick fel.'); });
+  });
+
+  function taBortRep(id){
+    if (!confirm('Ta bort den här repeatern?')) return;
+    fetch('/api/repeaters/'+id,{method:'DELETE'})
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        if (res.ok){ laddaRepeatrar(); }
+        else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
+      });
+  }
+
+  // ====================== SDR-MOTTAGARE ======================
+  function laddaSdr(){
+    fetch('/api/sdr')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var lista = document.getElementById('sdrlista');
+        var items = (data && data.mottagare) || [];
+        if (!items.length){ lista.innerHTML = '<p class="litet">Inga mottagare ännu.</p>'; return; }
+        lista.innerHTML = items.map(function(s){
+          var st = STATUS_TEXT[s.status] ? s.status : 'drift';
+          return '<div class="rep-rad">'+
+            '<span class="r-namn">'+esc(s.namn)+'</span>'+
+            '<span class="r-frq">'+esc(s.plats || '')+'</span>'+
+            '<span class="st-pill '+st+'">'+STATUS_TEXT[st]+'</span>'+
+            '<span style="display:flex;gap:8px">'+
+            '<button class="r-red" data-red-sdr="'+s.id+'">Redigera</button>'+
+            '<button class="r-ta" data-ta-sdr="'+s.id+'">Ta bort</button>'+
+            '</span></div>';
+        }).join('');
+        window._sdr = items;
+        [].forEach.call(lista.querySelectorAll('button[data-red-sdr]'), function(b){
+          b.addEventListener('click', function(){ redigeraSdr(b.getAttribute('data-red-sdr')); });
+        });
+        [].forEach.call(lista.querySelectorAll('button[data-ta-sdr]'), function(b){
+          b.addEventListener('click', function(){ taBortSdr(b.getAttribute('data-ta-sdr')); });
+        });
+      });
+  }
+  function rensaSdrForm(){
+    document.getElementById('sdr-id').value = '';
+    document.getElementById('sdr-namn').value = '';
+    document.getElementById('sdr-plats').value = '';
+    document.getElementById('sdr-frekvens').value = '';
+    document.getElementById('sdr-status').value = 'drift';
+    document.getElementById('sdr-sort').value = '';
+    document.getElementById('sdr-felanm').checked = true;
+    document.getElementById('sdr-form-titel').textContent = 'Ny mottagare';
+    document.getElementById('spara-sdr-knapp').textContent = 'Lägg till mottagare';
+    document.getElementById('avbryt-sdr-knapp').classList.add('doldt');
+  }
+  function redigeraSdr(id){
+    var s = (window._sdr || []).filter(function(x){ return String(x.id) === String(id); })[0];
+    if (!s) return;
+    document.getElementById('sdr-id').value = s.id;
+    document.getElementById('sdr-namn').value = s.namn || '';
+    document.getElementById('sdr-plats').value = s.plats || '';
+    document.getElementById('sdr-frekvens').value = s.frekvens || '';
+    document.getElementById('sdr-status').value = s.status || 'drift';
+    document.getElementById('sdr-sort').value = (s.sortering !== null && s.sortering !== undefined) ? s.sortering : '';
+    document.getElementById('sdr-felanm').checked = !!s.i_felanmalan;
+    document.getElementById('sdr-form-titel').textContent = 'Redigerar: ' + s.namn;
+    document.getElementById('spara-sdr-knapp').textContent = 'Spara ändringar';
+    document.getElementById('avbryt-sdr-knapp').classList.remove('doldt');
+    document.getElementById('pane-sdr').scrollIntoView({ block:'start', behavior:'smooth' });
+  }
+  document.getElementById('avbryt-sdr-knapp').addEventListener('click', rensaSdrForm);
+
+  document.getElementById('spara-sdr-knapp').addEventListener('click', function(){
+    rensaMelding(adminMelding);
+    var namn = document.getElementById('sdr-namn').value.trim();
+    if (!namn){ melding(adminMelding,'fel','Ange ett namn.'); return; }
+    var payload = {
+      namn: namn,
+      plats: document.getElementById('sdr-plats').value.trim(),
+      frekvens: document.getElementById('sdr-frekvens').value.trim(),
+      status: document.getElementById('sdr-status').value,
+      i_felanmalan: document.getElementById('sdr-felanm').checked
+    };
+    var sort = document.getElementById('sdr-sort').value.trim();
+    if (sort !== '') payload.sortering = sort;
+    var id = document.getElementById('sdr-id').value;
+    var url = id ? '/api/sdr/'+id : '/api/sdr';
+    var metod = id ? 'PATCH' : 'POST';
+    var knapp = this; knapp.disabled = true;
+    fetch(url, { method:metod, headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        knapp.disabled = false;
+        if (res.ok){ melding(adminMelding,'ok', id ? 'Ändringarna är sparade.' : 'Mottagaren är tillagd.'); rensaSdrForm(); laddaSdr(); }
+        else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte spara.'); }
+      })
+      .catch(function(){ knapp.disabled = false; melding(adminMelding,'fel','Något gick fel.'); });
+  });
+
+  function taBortSdr(id){
+    if (!confirm('Ta bort den här mottagaren?')) return;
+    fetch('/api/sdr/'+id,{method:'DELETE'})
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        if (res.ok){ laddaSdr(); }
         else { melding(adminMelding,'fel', res.d.fel || 'Kunde inte ta bort.'); }
       });
   }

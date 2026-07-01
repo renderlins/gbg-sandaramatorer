@@ -1,0 +1,23 @@
+-- Klubbens repeatrar. Tekniska specar på de analoga 2m/70cm-stationerna.
+INSERT INTO repeaters (namn, anropssignal, band, frekvens, lage, kanal_info, plats, status, i_felanmalan, sortering,
+  tx_antenn, tx_matare, sandare, slutsteg, rx_antenn, rx_matare, mottagare, oppningston, logik_not) VALUES
+  ('D-STAR SK6SA', 'SK6SA', '70 cm', '434.5125 MHz', 'D-STAR', 'RU361 (−2 MHz), Icom', 'Guldheden', 'drift', 1, 10,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'D-STAR-repeatern (SK6SA B), Guldheden, för 70 cm är igång på kanal RU361 (434.5125 MHz, −2 MHz).'),
+  ('DMR SK6AG', 'SK6AG', '70 cm', '434.7875 MHz', 'DMR', 'RU383 (−2 MHz), CC6, TS1&2', 'Guldheden', 'drift', 1, 20,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'DMR-repeatern (SK6AG), Guldheden, för 70 cm är igång på kanal RU383 (434.7875 MHz, −2 MHz), CC6. Timeslot 1 & 2 länkade till Brandmeister.'),
+  ('C4FM SK6RFQ', 'SK6RFQ', '70 cm', '434.600 MHz', 'C4FM', 'RU0, kopplad mot SWEDEN-HUB', 'Guldheden', 'drift', 0, 30,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  ('2 m analog', 'SK6RFQ', '2 m', '145.650 MHz', 'FM', 'R2 (RV52), FM N-12,5 kHz', 'Guldheden', 'drift', 1, 40,
+    'Aerial Oy AV1912 (4st stackade öppna dipoler)', '4 m Huber-Suhner SUCOFEED ½″ (−2,7 dB/100 m)', 'Motorola GM 340, 20 W efter kavitetsfilter', NULL,
+    'Triband', '12 m Cellflex ½″ (−2,7 dB/100 m)', 'Motorola GM 340, känslighet 0,3 µV vid 12 dB Sinad',
+    '1750 Hz, DTMF 1 eller CTCSS 114,8 Hz', 'Gemensam logik med 70 cm — RX och TX helt parallellkopplade. UPS för drift vid strömbortfall.'),
+  ('70 cm analog', 'SK6RFQ', '70 cm', '434.650 MHz', 'FM', 'RU2 (RU372), parallellt med 2 m', 'Guldheden', 'drift', 1, 50,
+    'Aerial Oy AV1914 (4st stackade öppna dipoler)', '6 m Cellflex ½″ (−6,7 dB/100 m)', 'Motorola GM 360, 10 W', 'Johnsson 80 W efter kavitetsfilter (fd Comvik-slutsteg)',
+    'Aerial Oy AV1914 (4st stackade öppna dipoler)', '11 m Huber-Suhner SUCOFEED ½″ (−6,7 dB/100 m)', 'Motorola GM 360, känslighet 0,3 µV vid 12 dB Sinad',
+    '1750 Hz, DTMF 1 eller CTCSS 114,8 Hz', 'Gemensam logik med 2 m — RX och TX helt parallellkopplade. UPS för drift vid strömbortfall.'),
+  ('6 m', 'SK6RFQ', '6 m', '51.870 MHz', 'FM', 'In 51.270 MHz. TX Guldheden, RX Kortedala.', 'Guldheden/Kortedala', 'drift', 1, 60,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1750 Hz, subton 114,8 Hz eller DTMF 6', 'Sändare på Guldheden, mottagare i Kortedala. Gemensam logik — RX och TX helt parallellkopplade.'),
+  ('10 m', 'SK6RFQ', '10 m', '29.680 MHz', 'FM', 'In 29.580 MHz. TX Guldheden, RX Kortedala.', 'Guldheden/Kortedala', 'drift', 1, 70,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1750 Hz, subton 114,8 Hz eller DTMF 6', 'Sändare på Guldheden, mottagare i Kortedala. Gemensam logik — RX och TX helt parallellkopplade.'),
+  ('SK6RKI', 'SK6RKI', '23 cm', '1297.150 MHz', 'FM', NULL, NULL, 'drift', 1, 80,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);

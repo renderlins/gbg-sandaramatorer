@@ -16,7 +16,7 @@ export async function onRequestGet(context) {
   if (!user) return json({ fel: "Du måste vara inloggad." }, 401);
 
   const { results } = await env.DB.prepare(
-    "SELECT id, callsign, namn, epost, vill_bli_medlem, bidrag_repeater, bidrag_klubb, har_fraga, meddelande, hanterad, skapad FROM requests ORDER BY skapad DESC, id DESC"
+    "SELECT id, callsign, namn, epost, vill_bli_medlem, bidrag_repeater, bidrag_klubb, har_fraga, meddelande, hanterad, arende, galler, skapad FROM requests ORDER BY skapad DESC, id DESC"
   ).all();
   return json({ forfragningar: results || [] });
 }
@@ -55,10 +55,14 @@ export async function onRequestPost(context) {
   const bidragKlubb = bool(body.bidrag_klubb);
   const harFraga = bool(body.har_fraga);
 
+  var arende = (body.arende || "medlem").trim();
+  if (arende !== "felanmalan") arende = "medlem";
+  const galler = (body.galler || "").trim() || null;
+
   await env.DB.prepare(
-    "INSERT INTO requests (callsign, namn, epost, vill_bli_medlem, bidrag_repeater, bidrag_klubb, har_fraga, meddelande) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+    "INSERT INTO requests (callsign, namn, epost, vill_bli_medlem, bidrag_repeater, bidrag_klubb, har_fraga, meddelande, arende, galler) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
   )
-    .bind(callsign, namn, epost, villBliMedlem, bidragRepeater, bidragKlubb, harFraga, meddelande)
+    .bind(callsign, namn, epost, villBliMedlem, bidragRepeater, bidragKlubb, harFraga, meddelande, arende, galler)
     .run();
 
   return json({ ok: true }, 201);
