@@ -27,6 +27,8 @@ export async function onRequestPost(context) {
 
   const plats = (body.plats || "").trim() || null;
   const frekvens = (body.frekvens || "").trim() || null;
+  const lank = (body.lank || "").trim() || null;
+  const kraverInloggning = body.kraver_inloggning ? 1 : 0;
   let status = (body.status || "drift").trim();
   if (!STATUSAR.includes(status)) status = "drift";
   const iFelanmalan = body.i_felanmalan ? 1 : 0;
@@ -34,8 +36,8 @@ export async function onRequestPost(context) {
   if (isNaN(sortering)) sortering = 100;
 
   const res = await env.DB.prepare(
-    "INSERT INTO sdr_mottagare (namn, plats, frekvens, status, i_felanmalan, sortering) VALUES (?, ?, ?, ?, ?, ?)"
-  ).bind(namn, plats, frekvens, status, iFelanmalan, sortering).run();
+    "INSERT INTO sdr_mottagare (namn, plats, frekvens, status, i_felanmalan, sortering, lank, kraver_inloggning) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+  ).bind(namn, plats, frekvens, status, iFelanmalan, sortering, lank, kraverInloggning).run();
 
   return json({ ok: true, id: res.meta.last_row_id }, 201);
 }

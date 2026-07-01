@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDR-mottagare – SK6AG</title>
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<style>
+  :root{
+    --navy:#0c2747;--navy-2:#103154;--navy-3:#0a2039;
+    --cobalt:#1b56b0;--gold:#f2c200;--gold-soft:#f6d75a;
+    --paper:#eef3f8;--muted:#8ea4bd;--line:rgba(242,194,0,.22);
+    --fel:#ff8d7a;--ok:#7ad19b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--navy);color:var(--paper);font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:900px;margin:0 auto;padding:0 28px}
+  a{color:var(--gold-soft)}
+
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(10,32,57,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topbar .inner{display:flex;justify-content:space-between;align-items:center;padding:16px 28px;max-width:1080px;margin:0 auto;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase}
+  .topbar .call-link{text-decoration:none;color:inherit}
+  .topbar .call{color:var(--gold-soft);font-weight:600;display:flex;align-items:center;gap:12px}
+  .topbar .call img{width:28px;height:28px}
+  .topbar nav a{color:var(--muted);text-decoration:none;margin-left:22px;transition:color .2s}
+  .topbar nav a:hover{color:var(--paper)}
+
+  header.head{padding:60px 0 10px;border-bottom:1px solid var(--line)}
+  .sec-label{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:14px}
+  .sec-label::before{content:"";width:34px;height:1px;background:var(--gold)}
+  h1{font-size:clamp(2rem,4vw,2.9rem);font-weight:500;letter-spacing:-.01em;line-height:1.1;margin-bottom:14px}
+  .lead{color:#c3d0dd;max-width:64ch;margin-bottom:6px}
+
+  section{padding:36px 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:none}
+  h2{font-size:1.5rem;font-weight:500;margin-bottom:8px}
+  p{margin-bottom:14px;color:#d3dde8}
+
+  /* Mottagarkort */
+  .mott-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:18px}
+  @media(max-width:600px){.mott-grid{grid-template-columns:1fr}}
+  .mott{background:var(--navy-2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .mott .namn{font-size:1.2rem;font-weight:500;color:var(--paper);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .mott .status-prick{display:inline-block;width:9px;height:9px;border-radius:50%}
+  .mott .status-prick.drift{background:#7ad19b}
+  .mott .status-prick.ur_drift{background:#ff8d7a}
+  .mott .status-prick.underhall{background:#f2c200}
+  .mott .info{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.82rem;color:var(--muted)}
+  .mott .info.ur{color:var(--fel)}
+  .mott-knapp{display:inline-block;margin-top:4px;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:10px 18px;border-radius:8px;text-decoration:none;text-align:center;background:var(--gold);color:var(--navy-3);transition:background .2s}
+  .mott-knapp:hover{background:var(--gold-soft)}
+  .mott-knapp.ingen{background:transparent;border:1px solid var(--line);color:var(--muted);cursor:default}
+  .inlogg-tag{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:100px;background:rgba(242,194,0,.14);color:var(--gold-soft);border:1px solid rgba(242,194,0,.35)}
+
+  .info-kort{background:var(--navy-2);border:1px solid var(--line);border-left:3px solid var(--gold);padding:20px 24px;margin:12px 0}
+  .info-kort p:last-child{margin-bottom:0}
+
+  .cta-rad{margin-top:20px}
+  .btn{display:inline-block;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;padding:14px 28px;text-decoration:none;font-weight:700;transition:background .2s,transform .2s}
+  .btn-primary{color:var(--navy);background:var(--gold)}
+  .btn-primary:hover{background:var(--gold-soft);transform:translateY(-2px)}
+
+  .anm{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.9rem;color:var(--muted)}
+
+  footer{border-top:1px solid var(--line);margin-top:50px;padding:40px 0;font-family:"Helvetica Neue",Arial,sans-serif;font-size:.8rem;color:var(--muted)}
+  footer a{margin-right:22px;text-decoration:none}
+  @media(max-width:600px){.topbar nav{display:none}}
+</style>
+</head>
+<body>
+  <div class="topbar" id="top">
+    <div class="inner">
+      <a class="call-link" href="../index.html"><span class="call"><img src="../favicon.svg" alt="GSA">SK6AG · Göteborgs Sändareamatörer</span></a>
+      <nav>
+        <a href="../repeatrar/">Repeatrar</a>
+        <a href="../index.html#kommande">Kommande</a>
+        <a href="../index.html#kontakt">Kontakt</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="head">
+    <div class="wrap">
+      <div class="sec-label">SDR-mottagare</div>
+      <h1>Lyssna live via klubbens mottagare</h1>
+      <p class="lead">GSA driver flera SDR-mottagare där du kan lyssna på radiotrafik på frekvenser upp till 30 MHz — direkt i webbläsaren, var du än är.</p>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <p>Oftast används mottagarna av sändaramatörer som har höga störningsnivåer hemma — man kan då lyssna via SDR-mottagaren istället och sända från sin egen sändare. Det går förstås även bra att bara lyssna på de olika frekvenserna om man är nyfiken på hur radiotrafiken låter.</p>
+      <p>Ett populärt användningsområde är att testa hur man själv låter när man sänder, eller hur signalstyrkan vid mottagaren förändras vid olika antenner eller justeringar.</p>
+      <p>Mottagarna är av märket KiwiSDR. Beroende på konfiguration kan 4 respektive 8 användare lyssna samtidigt på olika frekvenser.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Mottagare</h2>
+      <div id="mottagare" class="mott-grid"><p class="anm">Laddar mottagare…</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Karta över KiwiSDR-mottagare</h2>
+      <div class="info-kort">
+        <p>En karta med alla världens uppkopplade KiwiSDR-mottagare hittar du på <a href="http://rx.linkfanel.net/" target="_blank" rel="noopener">rx.linkfanel.net</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Anmäl driftstörning eller lämna förslag</h2>
+      <p>Fungerar inte en mottagare som den ska, eller har du önskemål om en funktion? Använd felanmälningsformuläret.</p>
+      <div class="cta-rad">
+        <a href="../felanmalan/" class="btn btn-primary">Till felanmälan</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <a href="../index.html">Till startsidan</a>
+      <a href="../repeatrar/">Repeatrar</a>
+      <a href="../index.html#kontakt">Kontakt</a>
+    </div>
+  </footer>
+
+  <script>
+  (function(){
+    var STATUS_TEXT = { drift:'I drift', ur_drift:'Ur drift', underhall:'Underhåll' };
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+    fetch('/api/sdr')
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(data){
+        var el = document.getElementById('mottagare');
+        var items = (data && data.mottagare) || [];
+        if (!items.length){ el.innerHTML = '<p class="anm">Inga mottagare registrerade ännu.</p>'; return; }
+        el.innerHTML = items.map(function(s){
+          var st = STATUS_TEXT[s.status] ? s.status : 'drift';
+          var statusMark = (st !== 'drift')
+            ? '<span class="status-prick '+st+'"></span>'
+            : '';
+          var inloggTag = s.kraver_inloggning ? '<span class="inlogg-tag">Kräver inloggning</span>' : '';
+          var statusRad = (st !== 'drift')
+            ? '<div class="info ur">'+STATUS_TEXT[st]+'</div>'
+            : '';
+          var knapp;
+          if (s.lank){
+            knapp = '<a class="mott-knapp" href="'+esc(s.lank)+'" target="_blank" rel="noopener">Lyssna live →</a>';
+          } else {
+            knapp = '<span class="mott-knapp ingen">Ingen länk</span>';
+          }
+          return '<div class="mott">'+
+            '<div class="namn">'+statusMark+esc(s.namn)+inloggTag+'</div>'+
+            statusRad +
+            knapp +
+            '</div>';
+        }).join('');
+      })
+      .catch(function(){
+        document.getElementById('mottagare').innerHTML = '<p class="anm">Kunde inte ladda mottagarna just nu.</p>';
+      });
+  })();
+  </script>
+
+  <button id="till-topp" title="Till toppen" aria-label="Till toppen" style="position:fixed;right:24px;bottom:24px;width:46px;height:46px;border-radius:50%;background:var(--navy-2);border:1px solid var(--line);color:var(--gold-soft);cursor:pointer;font-size:1.3rem;line-height:1;display:none;align-items:center;justify-content:center;z-index:60;box-shadow:0 4px 14px rgba(0,0,0,.3)">↑</button>
+  <script>
+  (function(){var k=document.getElementById('till-topp');window.addEventListener('scroll',function(){k.style.display=window.pageYOffset>300?'flex':'none';});k.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});})();
+  </script>
+</body>
+</html>

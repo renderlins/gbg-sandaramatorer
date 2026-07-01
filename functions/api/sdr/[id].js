@@ -27,6 +27,15 @@ export async function onRequestPatch(context) {
       bind.push(v || null);
     }
   });
+  if (body.lank !== undefined) {
+    const v = String(body.lank).trim();
+    set.push("lank = ?");
+    bind.push(v || null);
+  }
+  if (body.kraver_inloggning !== undefined) {
+    set.push("kraver_inloggning = ?");
+    bind.push(body.kraver_inloggning ? 1 : 0);
+  }
   if (body.status !== undefined) {
     let status = String(body.status).trim();
     if (!STATUSAR.includes(status)) status = "drift";

@@ -428,7 +428,10 @@
               </select></div>
               <div><label for="sdr-sort">Sortering</label><input type="number" id="sdr-sort" placeholder="100"></div>
             </div>
+            <label for="sdr-lank">Direktlänk (KiwiSDR-mottagare)</label>
+            <input type="text" id="sdr-lank" placeholder="http://sk6agX.ddns.net:80XX/">
             <label class="kryssrad"><input type="checkbox" id="sdr-felanm" checked> Visa i felanmälan</label>
+            <label class="kryssrad"><input type="checkbox" id="sdr-inlogg"> Kräver inloggning</label>
 
             <div class="form-knappar">
               <button class="knapp" id="spara-sdr-knapp">Lägg till mottagare</button>
@@ -1046,9 +1049,11 @@
         if (!items.length){ lista.innerHTML = '<p class="litet">Inga mottagare ännu.</p>'; return; }
         lista.innerHTML = items.map(function(s){
           var st = STATUS_TEXT[s.status] ? s.status : 'drift';
+          var lankInfo = s.lank ? '🔗 länk' : 'ingen länk';
+          if (s.kraver_inloggning) lankInfo += ' · inloggning';
           return '<div class="rep-rad">'+
             '<span class="r-namn">'+esc(s.namn)+'</span>'+
-            '<span class="r-frq">'+esc(s.plats || '')+'</span>'+
+            '<span class="r-frq">'+esc(lankInfo)+'</span>'+
             '<span class="st-pill '+st+'">'+STATUS_TEXT[st]+'</span>'+
             '<span style="display:flex;gap:8px">'+
             '<button class="r-red" data-red-sdr="'+s.id+'">Redigera</button>'+
@@ -1069,9 +1074,11 @@
     document.getElementById('sdr-namn').value = '';
     document.getElementById('sdr-plats').value = '';
     document.getElementById('sdr-frekvens').value = '';
+    document.getElementById('sdr-lank').value = '';
     document.getElementById('sdr-status').value = 'drift';
     document.getElementById('sdr-sort').value = '';
     document.getElementById('sdr-felanm').checked = true;
+    document.getElementById('sdr-inlogg').checked = false;
     document.getElementById('sdr-form-titel').textContent = 'Ny mottagare';
     document.getElementById('spara-sdr-knapp').textContent = 'Lägg till mottagare';
     document.getElementById('avbryt-sdr-knapp').classList.add('doldt');
@@ -1083,9 +1090,11 @@
     document.getElementById('sdr-namn').value = s.namn || '';
     document.getElementById('sdr-plats').value = s.plats || '';
     document.getElementById('sdr-frekvens').value = s.frekvens || '';
+    document.getElementById('sdr-lank').value = s.lank || '';
     document.getElementById('sdr-status').value = s.status || 'drift';
     document.getElementById('sdr-sort').value = (s.sortering !== null && s.sortering !== undefined) ? s.sortering : '';
     document.getElementById('sdr-felanm').checked = !!s.i_felanmalan;
+    document.getElementById('sdr-inlogg').checked = !!s.kraver_inloggning;
     document.getElementById('sdr-form-titel').textContent = 'Redigerar: ' + s.namn;
     document.getElementById('spara-sdr-knapp').textContent = 'Spara ändringar';
     document.getElementById('avbryt-sdr-knapp').classList.remove('doldt');
@@ -1101,8 +1110,10 @@
       namn: namn,
       plats: document.getElementById('sdr-plats').value.trim(),
       frekvens: document.getElementById('sdr-frekvens').value.trim(),
+      lank: document.getElementById('sdr-lank').value.trim(),
       status: document.getElementById('sdr-status').value,
-      i_felanmalan: document.getElementById('sdr-felanm').checked
+      i_felanmalan: document.getElementById('sdr-felanm').checked,
+      kraver_inloggning: document.getElementById('sdr-inlogg').checked
     };
     var sort = document.getElementById('sdr-sort').value.trim();
     if (sort !== '') payload.sortering = sort;
