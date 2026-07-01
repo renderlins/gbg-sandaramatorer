@@ -58,6 +58,12 @@
   .losen-visa .info{font-size:.86rem; color:var(--muted)}
 
   .laddar,.ejinlogg{text-align:center; padding:60px 20px; color:var(--muted)}
+  .losen-rad{display:flex; gap:8px; align-items:stretch}
+  .losen-rad input{flex:1}
+  .losen-btn{background:none; border:1px solid var(--line); color:var(--gold-soft); cursor:pointer;
+    font:inherit; font-size:.84rem; border-radius:8px; padding:0 14px; white-space:nowrap; transition:background .15s}
+  .losen-btn:hover{background:var(--navy-3)}
+  .losen-btn.klar{color:var(--ok); border-color:rgba(122,209,155,.4)}
   .doldt{display:none !important}
 </style>
 </head>
@@ -100,7 +106,11 @@
         <label for="ny-epost">E-post</label>
         <input type="email" id="ny-epost" placeholder="namn@exempel.se" autocomplete="off">
         <label for="ny-losen">Lösenord (minst 8 tecken)</label>
-        <input type="text" id="ny-losen" placeholder="Välj ett lösenord" autocomplete="off">
+        <div class="losen-rad">
+          <input type="text" id="ny-losen" placeholder="Välj eller generera" autocomplete="off">
+          <button type="button" class="losen-btn" id="generera-knapp" title="Generera lösenord">Generera</button>
+          <button type="button" class="losen-btn" id="kopiera-knapp" title="Kopiera lösenord">Kopiera</button>
+        </div>
         <button class="knapp" id="skapa-knapp">Skapa konto</button>
       </div>
     </div>
@@ -184,6 +194,37 @@
           if (res.ok){ visaMelding('ok','Kontot är borttaget.'); laddaKonton(); }
           else { visaMelding('fel', res.d.fel || 'Kunde inte ta bort.'); }
         });
+    }
+
+    // Generera / kopiera lösenord (samma teckenuppsättning som servern, utan förväxlingsbara tecken)
+    function generera(){
+      var t = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+      var arr = crypto.getRandomValues(new Uint8Array(14));
+      var ut = "";
+      for (var i=0;i<arr.length;i++) ut += t[arr[i] % t.length];
+      return ut;
+    }
+    var losenFalt = document.getElementById('ny-losen');
+    document.getElementById('generera-knapp').addEventListener('click', function(){
+      losenFalt.value = generera();
+    });
+    document.getElementById('kopiera-knapp').addEventListener('click', function(){
+      var v = losenFalt.value;
+      if (!v){ visaMelding('fel','Inget lösenord att kopiera – generera först.'); return; }
+      var knapp = this;
+      function visaKopierad(){
+        knapp.textContent = 'Kopierat'; knapp.classList.add('klar');
+        setTimeout(function(){ knapp.textContent='Kopiera'; knapp.classList.remove('klar'); }, 1600);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(v).then(visaKopierad, function(){ fallbackKopiera(v, visaKopierad); });
+      } else {
+        fallbackKopiera(v, visaKopierad);
+      }
+    });
+    function fallbackKopiera(text, klar){
+      losenFalt.select(); losenFalt.setSelectionRange(0, 99999);
+      try { document.execCommand('copy'); klar(); } catch(e){ visaMelding('fel','Kunde inte kopiera – markera och kopiera manuellt.'); }
     }
 
     document.getElementById('skapa-knapp').addEventListener('click', function(){
